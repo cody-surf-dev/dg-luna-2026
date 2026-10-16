@@ -585,7 +585,7 @@ const QUIZ=[
  ["Кто такой Коди?","«Коди — это я, бро. Дайте мне быть собой»","Кот соседей","Мой тренер по волейболу","Ник в покере"],
  ["Чем я занимаюсь по утрам на Пхукете?","Катаю 😎","Медитирую на пляже","Сплю до обеда","Бегаю 10 км"],
  ["Как я тебя называю?","Джени","Зайка","Дашуля","Солнце"],
- ["Как я называю Габи?","Малышок","Пушок","Булочка","Габриэлла"],
+ ["Как я называю Габи?","Малышок","Пушок","Булочка","Колбаска"],
  ["Куда было наше первое совместное путешествие?","Таиланд","Байкал","Сочи","Турция"],
  ["Что я делаю, когда нервничаю?","Ору как бешеный","Молча ем","Ухожу гулять","Залипаю в телефон"],
  ["Моя самая странная привычка?","Быть честным","Спать в носках","Считать ступеньки","Разговаривать с Габи как с человеком"],
@@ -599,7 +599,7 @@ const QUIZ=[
  ["Куда я хочу сводить тебя на Пхукете в первую очередь?","Пляж Найхарн","Пхукет-таун","Патонг","Большой Будда"],
  ["Наша фраза, понятная только нам?","«Да, они все долбоебы»","«Ну всё, поехали»","«Это база»","«Мы просто красивые»"]
 ];
-const MISS=["Мимо! Подумай ещё 😏","Не-а. Женя обиделся бы, но он добрый 😄","Холодно, как в Иркутске ❄","Почти! Ну, нет, совсем не почти 😅"];
+const MISS=["Мимо! 😏","Не-а! Женя обиделся бы, но он добрый 😄","Холодно, как в Иркутске ❄","Почти! Ну, нет, совсем не почти 😅"];
 function gameFor(i){
   if(i%2===1 && (i-1)/2<QUIZ.length) return {type:"quiz",q:QUIZ[(i-1)/2]};
   return {type:["puzzle","scratch","memory"][Math.floor(i/2)%3]};
@@ -610,10 +610,12 @@ function quizGame(src,win,hint,q,seed){
   hint.hidden=false;hint.innerHTML="<span>Сегодня открытка откроется, если ты хорошо знаешь Женю 😉</span>";
   const r=rng(seed*31+7);const opts=q.slice(1).map((t,k)=>({t,ok:k===0,o:r()})).sort((a,b)=>a.o-b.o);
   box.hidden=false;box.innerHTML=`<div class="q">${q[0]}</div><div class="opts"></div><div class="fb" aria-live="polite"></div>`;
-  const wrap=box.querySelector(".opts"),fb=box.querySelector(".fb");let miss=0;
+  const wrap=box.querySelector(".opts"),fb=box.querySelector(".fb");
   opts.forEach(o=>{const b=document.createElement("button");b.type="button";b.textContent=o.t;
     b.onclick=()=>{if(o.ok){b.classList.add("yes");fb.textContent="Правильно! ❤";setTimeout(()=>{box.hidden=true;win();},500);}
-      else{b.classList.add("no");b.disabled=true;fb.textContent=MISS[miss++%MISS.length];}};
+      else{b.classList.add("no");wrap.querySelectorAll("button").forEach(x=>{x.disabled=true;if(x.textContent===q[1])x.classList.add("yes")});
+        fb.textContent=MISS[seed%MISS.length]+" Правильно: «"+q[1].replace(/[«»]/g,"")+"». Штрафная! Собери пазл, чтобы заслужить открытку 😈";
+        setTimeout(()=>puzzle(src,win,hint),2200);}};
     wrap.appendChild(b);});
 }
 function memory(src,win,hint){
@@ -655,7 +657,7 @@ function showCard(idx){
   const msgEl=document.getElementById("msg"), hint=document.getElementById("hint");
   msgEl.textContent=msg;
   document.getElementById("quiz").hidden=true;
-  const showOpen=()=>{document.getElementById("art").innerHTML=`<img src="${src}" alt="">`;msgEl.classList.remove("locked");hint.hidden=true;};
+  const showOpen=()=>{document.getElementById("quiz").hidden=true;document.getElementById("art").innerHTML=`<img src="${src}" alt="">`;msgEl.classList.remove("locked");hint.hidden=true;};
   if(isToday && !arrived && days>0 && !isSolved(idx)){
     msgEl.classList.add("locked");
     const win=()=>{markSolved(idx);celebrate();setTimeout(()=>{if(viewIdx===idx)showOpen()},900);};
