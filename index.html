@@ -168,7 +168,7 @@ footer{text-align:center;font-size:12px;color:var(--ink-soft)}
 // ===== Настройки =====
 const TEST = location.hash==="#zhenya-test"; // тестовый режим
 const ARRIVAL = new Date("2026-12-05T12:00:00+07:00"); // дата приезда (время Пхукета)
-const START   = new Date("2026-10-15T00:00:00+08:00"); // день запуска странички
+const START   = new Date("2026-10-15T06:00:00+08:00"); // день запуска странички
 
 const MESSAGES = [
   "Смотрю на ту же луну, что и ты. Значит, мы не так уж далеко друг от друга.",
@@ -235,7 +235,7 @@ const IMAGES = {
 
 // ===== Утилиты =====
 const DAY = 864e5;
-const tzDay = (d) => Math.floor((d.getTime() + 8*3600e3) / DAY); // день по Иркутску
+const tzDay = (d) => Math.floor((d.getTime() + 2*3600e3) / DAY); // новый день в 6:00 по Иркутску (UTC+8)
 function plural(n, one, few, many){
   const a=Math.abs(n)%100,b=a%10;
   if(a>10&&a<20) return many; if(b>1&&b<5) return few; if(b===1) return one; return many;
@@ -817,7 +817,7 @@ function tick(){
 if(TEST){const f=document.getElementById("foot");f.textContent="Тестовый режим: листай все дни, прогресс игр не сохраняется";f.style.color="#e2574c";f.style.fontWeight="700";}
 tick(); setInterval(tick,1000);
 // автообновление: если на сайте вышла новая версия, страница перезагрузится сама
-const PAGE_VER="1792162217";
+const PAGE_VER="1792162421";
 async function checkVer(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});const v=(await r.text()).trim();if(v&&v!==PAGE_VER)location.reload();}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden){checkVer();tick();}});
 window.addEventListener("pageshow",checkVer);
