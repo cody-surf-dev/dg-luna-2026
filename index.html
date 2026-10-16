@@ -137,11 +137,12 @@ footer{text-align:center;font-size:12px;color:var(--ink-soft)}
     <div class="bar"><i id="fill"></i><em id="plane">✈</em></div>
   </section>
 
-  <footer>Только для нас троих. Новая открытка каждый день</footer>
+  <footer id="foot">Только для нас троих. Новая открытка каждый день</footer>
 </div>
 
 <script>
 // ===== Настройки =====
+const TEST = location.hash==="#zhenya-test"; // тестовый режим
 const ARRIVAL = new Date("2026-12-05T12:00:00+07:00"); // дата приезда (время Пхукета)
 const START   = new Date("2026-10-16T00:00:00+07:00"); // день запуска странички
 
@@ -528,8 +529,8 @@ let todayIdx=0, viewIdx=null, lastDay=null;
 
 // ===== Мини-игры =====
 const SKEY=i=>"dg-solved-"+i;
-function isSolved(i){try{return localStorage.getItem(SKEY(i))==="1"}catch(e){return false}}
-function markSolved(i){try{localStorage.setItem(SKEY(i),"1")}catch(e){}}
+function isSolved(i){if(TEST)return false;try{return localStorage.getItem(SKEY(i))==="1"}catch(e){return false}}
+function markSolved(i){if(TEST)return;try{localStorage.setItem(SKEY(i),"1")}catch(e){}}
 function celebrate(){
   const art=document.getElementById("art");
   for(let i=0;i<18;i++){const e=document.createElement("span");e.className="burst";e.textContent=["❤","💛","✨","🌴"][i%4];
@@ -630,9 +631,12 @@ function memory(src,win,hint){
           else{x.classList.remove("up");y.classList.remove("up");}open=[];busy=false;},650);}};
     m.appendChild(b);});
 }
+const LAST_IDX=tzDay(ARRIVAL)-tzDay(START);
 function showCard(idx){
-  const now=new Date(), arrived=ARRIVAL<=now, days=Math.max(0,tzDay(ARRIVAL)-tzDay(now));
-  const isToday=idx===todayIdx;
+  const now=new Date();
+  let arrived=ARRIVAL<=now, days=Math.max(0,tzDay(ARRIVAL)-tzDay(now));
+  let isToday=idx===todayIdx;
+  if(TEST){isToday=true;days=LAST_IDX-idx;arrived=days<0;}
   let sc=SCENES[idx%SCENES.length], msg=MESSAGES[idx%MESSAGES.length];
   if(isToday&&arrived){sc=ARRIVED_SCENE;msg="Ты прилетела. Всё, больше никаких обратных отсчётов. Добро пожаловать домой, мои девочки.";}
   else if(isToday&&days===0){sc=ARRIVED_SCENE;msg="Сегодня. Я уже в аэропорту и, кажется, улыбаюсь всем подряд.";}
@@ -665,10 +669,10 @@ function showCard(idx){
   const d=new Date(START.getTime()+idx*DAY);
   document.getElementById("today").textContent=d.toLocaleDateString("ru-RU",{day:"numeric",month:"long",timeZone:"Asia/Bangkok"});
   document.getElementById("prev").disabled=idx<=0;
-  document.getElementById("next").disabled=idx>=todayIdx;
+  document.getElementById("next").disabled=idx>=(TEST?LAST_IDX:todayIdx);
 }
 document.getElementById("prev").onclick=()=>{viewIdx=Math.max(0,viewIdx-1);showCard(viewIdx)};
-document.getElementById("next").onclick=()=>{viewIdx=Math.min(todayIdx,viewIdx+1);showCard(viewIdx)};
+document.getElementById("next").onclick=()=>{viewIdx=Math.min(TEST?LAST_IDX:todayIdx,viewIdx+1);showCard(viewIdx)};
 
 function tick(){
   const now=new Date(), ms=ARRIVAL-now, arrived=ms<=0;
@@ -690,6 +694,7 @@ function tick(){
     viewIdx=todayIdx; showCard(todayIdx);
   }
 }
+if(TEST){const f=document.getElementById("foot");f.textContent="Тестовый режим: листай все дни, прогресс игр не сохраняется";f.style.color="#e2574c";f.style.fontWeight="700";}
 tick(); setInterval(tick,1000);
 </script>
 </body>
