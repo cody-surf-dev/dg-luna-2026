@@ -625,7 +625,7 @@ const QUIZ=[
 ];
 const MISS=["Мимо! 😏","Не-а! Женя обиделся бы, но он добрый 😄","Холодно, как в Иркутске ❄","Почти! Ну, нет, совсем не почти 😅"];
 function gameFor(i){
-  if(i===1) return {type:"rps"};
+  if(i===1) return {type:"ttt"};
   if(i%2===1 && i>=3 && (i-3)/2<QUIZ.length) return {type:"quiz",q:QUIZ[(i-3)/2]};
   return {type:GAMES[Math.floor(i/2)%GAMES.length]};
 }
@@ -753,7 +753,7 @@ function pump(src,win,hint){
     document.getElementById("pc").textContent=`${n} / ${need}`;document.getElementById("pimg").style.filter=`blur(${Math.max(0,22*(1-n/need))}px)`;
     if(n>=need){art.querySelector(".gbox").remove();win();}};
 }
-const GAMES=["puzzle","catch","scratch","anagram","memory","ttt","rotate","rps","simon","find"];
+const GAMES=["puzzle","catch","scratch","anagram","memory","rps","rotate","simon","find","ttt"];
 function showCard(idx){
   const now=new Date();
   let arrived=ARRIVAL<=now, days=Math.max(0,tzDay(ARRIVAL)-tzDay(now));
@@ -817,7 +817,7 @@ function tick(){
 if(TEST){const f=document.getElementById("foot");f.textContent="Тестовый режим: листай все дни, прогресс игр не сохраняется";f.style.color="#e2574c";f.style.fontWeight="700";}
 tick(); setInterval(tick,1000);
 // автообновление: если на сайте вышла новая версия, страница перезагрузится сама
-const PAGE_VER="1792162094";
+const PAGE_VER="1792162217";
 async function checkVer(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});const v=(await r.text()).trim();if(v&&v!==PAGE_VER)location.reload();}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden){checkVer();tick();}});
 window.addEventListener("pageshow",checkVer);
