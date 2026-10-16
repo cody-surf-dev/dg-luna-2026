@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Даша и Габи едут</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marck+Script&family=Unbounded:wght@500;700&family=Manrope:wght@400;600;700&display=swap">
+<style>
+*{box-sizing:border-box}
+img{max-width:100%}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}
+/* Layout: countdown on top, one illustrated postcard (scene + handwritten back), route bar below. Single committed warm look. */
+:root{
+  --ink:#2b2340;
+  --ink-soft:#6b6385;
+  --paper:#fffaf2;
+  --line:#e7dccb;
+  --stamp:#e2574c;
+  --sea:#2bb3b1;
+  --bg-top:#cfe0f2;
+  --bg-bot:#ffd9b8;
+  --f-display:"Unbounded",system-ui,sans-serif;
+  --f-hand:"Marck Script","Segoe Script",cursive;
+  --f-body:"Manrope",system-ui,sans-serif;
+  color-scheme:light;
+}
+html,body{min-height:100%}
+body{
+  background:var(--bg-bot);
+  background-image:linear-gradient(180deg,var(--bg-top) 0%,var(--bg-bot) 100%);
+  background-attachment:fixed;
+  color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:28px 40px;
+}
+.wrap{max-width:540px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+header{text-align:center;display:flex;flex-direction:column;gap:6px}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);font-weight:600}
+.big{font-family:var(--f-display);font-weight:700;font-size:clamp(64px,22vw,112px);line-height:.95;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.big-label{font-family:var(--f-hand);font-size:30px;line-height:1.1;text-wrap:balance}
+.clock{display:flex;justify-content:center;gap:8px;margin-top:6px}
+.clock div{background:rgba(255,250,242,.7);border:1px solid rgba(43,35,64,.08);border-radius:10px;padding:6px 10px;min-width:58px}
+.clock b{display:block;font-family:var(--f-display);font-weight:500;font-size:20px;font-variant-numeric:tabular-nums}
+.clock span{font-size:11px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.08em}
+
+.card{background:var(--paper);border-radius:6px;padding:12px 12px 18px;box-shadow:0 1px 0 rgba(43,35,64,.06),0 18px 40px -18px rgba(43,35,64,.45);transform:rotate(-1deg);display:flex;flex-direction:column;gap:12px}
+.art{border-radius:3px;overflow:hidden;background:#e8eef5;aspect-ratio:3/2;max-width:100%}
+.art svg,.art img{width:100%;height:100%;display:block;object-fit:cover}
+.scene{font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--stamp);padding:0 6px}
+.back{display:grid;grid-template-columns:1fr auto;gap:12px;padding:0 6px;align-items:start}
+.msg{font-family:var(--f-hand);font-size:25px;line-height:1.3;color:var(--ink);min-width:0;text-wrap:pretty}
+.sign{font-family:var(--f-hand);font-size:22px;color:var(--ink-soft);margin-top:8px}
+.stamp{width:74px;height:88px;border:2px dashed var(--stamp);border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--stamp);transform:rotate(4deg);gap:2px;text-align:center}
+.stamp b{font-family:var(--f-display);font-size:24px;line-height:1}
+.stamp span{font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:600}
+.post{grid-column:1/-1;border-top:1px dashed var(--line);padding-top:10px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--ink-soft);letter-spacing:.04em}
+.nav{display:flex;gap:6px}
+.nav button{font:600 12px var(--f-body);color:var(--ink);background:transparent;border:1px solid var(--line);border-radius:99px;padding:5px 11px;cursor:pointer}
+.nav button:disabled{opacity:.35;cursor:default}
+.nav button:focus-visible{outline:2px solid var(--stamp);outline-offset:2px}
+
+.route{display:flex;flex-direction:column;gap:8px}
+.route-row{display:flex;justify-content:space-between;font-size:13px;font-weight:600;color:var(--ink-soft)}
+.bar{height:8px;border-radius:99px;background:rgba(43,35,64,.1);position:relative}
+.bar i{position:absolute;inset:0 auto 0 0;border-radius:99px;background:linear-gradient(90deg,#7fa6d6,var(--sea),#ff9a6b)}
+.bar em{position:absolute;top:50%;transform:translate(-50%,-50%) rotate(90deg);font-style:normal;font-size:18px;line-height:1}
+footer{text-align:center;font-size:12px;color:var(--ink-soft)}
+@media (prefers-reduced-motion:no-preference){.card{animation:land .9s cubic-bezier(.2,.8,.2,1) both}@keyframes land{from{transform:translateY(14px) rotate(-3deg)}to{transform:rotate(-1deg)}}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Иркутск → Пхукет</div>
+    <div class="big" id="days">—</div>
+    <div class="big-label" id="daysLabel">дней до встречи</div>
+    <div class="clock" aria-label="Точное время до встречи">
+      <div><b id="h">00</b><span>часов</span></div>
+      <div><b id="m">00</b><span>минут</span></div>
+      <div><b id="s">00</b><span>секунд</span></div>
+    </div>
+  </header>
+
+  <article class="card">
+    <div class="art" id="art" role="img" aria-label="Открытка дня"></div>
+    <div class="scene" id="scene"></div>
+    <div class="back">
+      <div>
+        <div class="msg" id="msg"></div>
+        <div class="sign">— твой Женя</div>
+      </div>
+      <div class="stamp"><span>открытка</span><b id="no">1</b><span>из Раваи</span></div>
+      <div class="post">
+        <span id="today"></span>
+        <div class="nav">
+          <button id="prev" type="button">← вчерашняя</button>
+          <button id="next" type="button">следующая →</button>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <section class="route" aria-label="Сколько пути уже позади">
+    <div class="route-row"><span>Иркутск ❄</span><span id="pct">0%</span><span>☀ Пхукет</span></div>
+    <div class="bar"><i id="fill"></i><em id="plane">✈</em></div>
+  </section>
+
+  <footer>Только для нас троих. Новая открытка каждый день</footer>
+</div>
+
+<script>
+// ===== Настройки =====
+const ARRIVAL = new Date("2026-12-05T12:00:00+07:00"); // дата приезда (время Пхукета)
+const START   = new Date("2026-10-16T00:00:00+07:00"); // день запуска странички
+
+const MESSAGES = [
+  "Каждый вечер смотрю на закат и думаю, что скоро будем смотреть на него вдвоём.",
+  "Нашёл кафе с видом на море. Столик на двоих уже присмотрел.",
+  "Габи тут понравится: песок тёплый, а голуби непуганые.",
+  "Здесь +31, а я всё равно жду, когда станет по-настоящему тепло. Это когда ты приедешь.",
+  "Сегодня море было такого цвета, что хочется показать только тебе.",
+  "Скучаю по тому, как ты смеёшься с моих дурацких шуток.",
+  "Тренирую фразу «моя жена прилетает» на тайском. Пока плохо.",
+  "Кровать слишком большая для одного. Это официальная жалоба.",
+  "Купил второй стакан для кофе. Пусть пока постоит.",
+  "Нашёл пляж, где утром никого нет. Это будет наш пляж.",
+  "Представляю, как Габи впервые увидит море и не поверит, что столько воды бывает.",
+  "Ещё чуть-чуть, и твоя шапка уедет в шкаф надолго.",
+  "Манго тут такое, что я готов ради него на многое. Но ради тебя на всё.",
+  "Каждый день на один шаг ближе. Сегодняшний шаг сделан.",
+  "Местный кот пытался со мной подружиться. Сказал ему, что у меня есть Габи.",
+  "Ты лучшее, что со мной случалось, и скоро ты случишься тут.",
+  "Вечером было слышно, как шумит море, и мне не хватало твоего «смотри!».",
+  "Ты храбрая: собрать дом, собаку и себя и перелететь полмира. Я горжусь тобой.",
+  "Пообещал себе, что первый закат мы встретим на берегу. Держу место.",
+  "Если тебе сегодня тяжело, вспомни: тут тебя ждёт тёплое море и я.",
+  "Проверил: облака тут похожи на Габи примерно в каждом третьем случае.",
+  "Ещё немного, и будем спорить, кто первый идёт плавать.",
+  "Твоя красная бандана тут будет смотреться идеально. Привези её обязательно.",
+  "Сегодня шёл дождь, тёплый, как ванна. Тебе понравится.",
+  "У меня тут всё есть, кроме самого главного.",
+  "Габи, держись. Скоро твои лапы узнают, что такое тёплый песок.",
+  "Каждое утро начинаю с мысли, сколько дней осталось. Сегодня меньше, чем вчера.",
+  "Хочу показать тебе фонарики на ночном рынке. Они как гирлянда на Новый год, только круглый год.",
+  "Ты моё самое любимое «скоро».",
+  "Я тут всё подготовлю. Тебе останется только приехать и сказать «вау».",
+  "Иркутск, отдавай её уже. Пожалуйста.",
+  "Сегодня был красивый день. Завтра будет на один день ближе к лучшему.",
+  "Посчитал: до тебя примерно 5000 км. Скоро будет ноль.",
+  "Скучаю. Это всё, что хотел сказать сегодня. Ну и что люблю.",
+  "Сегодня видел пару с маленькой собакой на пляже и улыбался как дурак.",
+  "Привези свою улыбку. Остальное найдём тут.",
+  "Море передаёт привет. И я.",
+  "Обнимаю тебя через полмира. Скоро обниму по-настоящему.",
+  "Тут тепло, а с тобой будет как дома.",
+  "Обратный отсчёт идёт. Сердце уже прилетело заранее.",
+  "Почти. Совсем почти.",
+  "Последние дни самые длинные. Давай вместе их потерпим.",
+  "Гусь на диване уже занял твоё место. Приезжай отвоёвывать.",
+  "Габи, в розовом худи тут будет жарко. Готовь футболочки.",
+  "Помню, как ты смеялась в лифте. Тут лифты тоже есть, приезжай."
+];
+
+// Картинки из Gemini: номер открытки → файл и подпись
+const IMAGES = {
+  1: {src:"img/01.jpg", title:"Одна луна на двоих"}
+};
+
+// ===== Утилиты =====
+const DAY = 864e5;
+const tzDay = (d) => Math.floor((d.getTime() + 7*3600e3) / DAY);
+function plural(n, one, few, many){
+  const a=Math.abs(n)%100,b=a%10;
+  if(a>10&&a<20) return many; if(b>1&&b<5) return few; if(b===1) return one; return many;
+}
+function rng(seed){ return () => { seed=(seed*16807)%2147483647; return (seed-1)/2147483646; }; }
+const G=(x,y,s,inner,flip)=>`<g transform="translate(${x} ${y}) scale(${flip?-s:s} ${s})">${inner}</g>`;
+const grad=(id,stops,h)=>`<linearGradient id="${id}" x1="0" y1="0" x2="${h?1:0}" y2="${h?0:1}">${stops.map(([o,c])=>`<stop offset="${o}" stop-color="${c}"/>`).join("")}</linearGradient>`;
+const heart=(x,y,s,c)=>`<path transform="translate(${x} ${y}) scale(${s})" d="M0 8 C-16 -2 -8 -15 0 -6 C8 -15 16 -2 0 8Z" fill="${c}"/>`;
+function qpt(t,a,b,c){const u=1-t;return [u*u*a[0]+2*u*t*b[0]+t*t*c[0], u*u*a[1]+2*u*t*b[1]+t*t*c[1]].map(v=>v.toFixed(1));}
+function palm(x,y,h=260,f=1,col="#2f7a4f",trunk="#7a5236"){
+  const tx=x+30*f, ty=y-h;
+  let s=`<path d="M${x} ${y} Q${x+44*f} ${y-h*.5} ${tx} ${ty}" stroke="${trunk}" stroke-width="16" fill="none" stroke-linecap="round"/>`;
+  for(let i=0;i<7;i++){const a=-Math.PI+i*Math.PI/6, L=115;
+    s+=`<path d="M${tx} ${ty} Q${(tx+Math.cos(a)*L*.55).toFixed(1)} ${(ty-34+Math.sin(a)*20).toFixed(1)} ${(tx+Math.cos(a)*L).toFixed(1)} ${(ty+Math.sin(a)*L*.4+48).toFixed(1)}" stroke="${col}" stroke-width="14" fill="none" stroke-linecap="round"/>`;}
+  return s;
+}
+function snow(seed,x0,x1,y0,y1,n){const r=rng(seed);let s="";for(let i=0;i<n;i++)s+=`<circle cx="${(x0+r()*(x1-x0)).toFixed(0)}" cy="${(y0+r()*(y1-y0)).toFixed(0)}" r="${(1.5+r()*3).toFixed(1)}" fill="#fff" opacity=".9"/>`;return s;}
+
+const PAT=`
+<pattern id="leaf" width="60" height="60" patternUnits="userSpaceOnUse"><rect width="60" height="60" fill="#efe6cf"/><path d="M4 52 Q20 20 54 8" stroke="#6f8fb8" stroke-width="8" fill="none" stroke-linecap="round"/><path d="M14 58 Q30 42 60 38" stroke="#cdb98f" stroke-width="6" fill="none"/><path d="M0 22 Q10 18 18 6" stroke="#31405a" stroke-width="2" fill="none"/></pattern>
+<pattern id="leo" width="22" height="22" patternUnits="userSpaceOnUse"><rect width="22" height="22" fill="#f9e7e3"/><path d="M3 7 q3 -4 6 0 M13 17 q3 -4 6 0 M14 5 q2 3 4 0" stroke="#d6908e" stroke-width="2" fill="none"/></pattern>
+<pattern id="pais" width="18" height="18" patternUnits="userSpaceOnUse"><rect width="18" height="18" fill="#d7332d"/><path d="M4 6 q4 -4 6 1 q-2 5 -6 -1" fill="none" stroke="#fff" stroke-width="1.4"/><circle cx="13" cy="14" r="1.4" fill="#fff"/></pattern>
+<pattern id="flor" width="14" height="14" patternUnits="userSpaceOnUse"><rect width="14" height="14" fill="#f7f2e8"/><circle cx="4" cy="4" r="2" fill="#e5848f"/><circle cx="11" cy="11" r="1.8" fill="#e5848f"/><circle cx="6" cy="6" r=".9" fill="#7aa36b"/></pattern>
+<pattern id="stripe" width="14" height="10" patternUnits="userSpaceOnUse"><rect width="14" height="10" fill="#f3ead9"/><rect width="5" height="10" fill="#7a4a2c"/></pattern>`;
+
+// ===== Персонажи =====
+const HAIR_D="#7a4b2e", HAIR_E="#bf9567", BEARD="#a86d3c";
+const EO={
+  hoodie:{torso:"#1f2027",sleeve:"#1f2027",pants:"#4a4e58",shoes:"#2a2a2e",det:`<path d="M-30 -208 Q0 -184 30 -208" stroke="#33343c" stroke-width="10" fill="none" stroke-linecap="round"/><path d="M-8 -196 L-9 -170 M8 -196 L9 -170" stroke="#d8d8dc" stroke-width="2.5"/><path d="M-26 -140 L26 -140 L22 -116 L-22 -116Z" fill="#2a2b33"/>`},
+  tropic:{torso:"url(#leaf)",sleeve:"url(#leaf)",under:"#1b1b1f",short:1,pants:"#5a5e69",shoes:"#ececec"},
+  tee:{torso:"#18181d",sleeve:"#18181d",short:1,pants:"#3a3d46",shoes:"#2a2a2e",det:`<g fill="#fff"><ellipse cx="-18" cy="-140" rx="7" ry="10"/><ellipse cx="0" cy="-138" rx="7" ry="11"/><ellipse cx="18" cy="-140" rx="7" ry="10"/></g><g fill="#18181d"><circle cx="-20" cy="-142" r="1.6"/><circle cx="-16" cy="-142" r="1.6"/><circle cx="-2" cy="-140" r="1.6"/><circle cx="2" cy="-140" r="1.6"/><circle cx="16" cy="-142" r="1.6"/><circle cx="20" cy="-142" r="1.6"/></g>`},
+  swim:{torso:"skin",sleeve:"skin",shorts:"#2f7fb8",shoes:"none",det:`<path d="M-18 -212 Q0 -176 18 -212" stroke="#c9c9cf" stroke-width="2.6" fill="none"/>`},
+  suit:{torso:"#17171c",sleeve:"#17171c",pants:"#17171c",shoes:"#0e0e10",det:`<path d="M-15 -210 L0 -166 L15 -210Z" fill="#fff"/><path d="M-4 -205 L4 -205 L6 -176 L0 -168 L-6 -176Z" fill="#0b0b0d"/><circle cx="0" cy="-150" r="2.4" fill="#444"/><circle cx="0" cy="-132" r="2.4" fill="#444"/>`},
+  winter:{torso:"#232428",sleeve:"#232428",pants:"#2e3038",shoes:"#1a1a1d",det:`<path d="M-50 -178 Q0 -170 50 -178 M-52 -148 Q0 -140 52 -148 M-48 -122 Q0 -114 48 -122" stroke="#3b3c43" stroke-width="3" fill="none"/><path d="M0 -210 L0 -108" stroke="#3b3c43" stroke-width="2.5"/><path d="M-26 -212 Q0 -196 26 -212" stroke="#a9adb6" stroke-width="12" fill="none" stroke-linecap="round"/>`}
+};
+const DO={
+  sweat:{torso:"#cfcfd4",sleeve:"#cfcfd4",pants:"#3a3a44",shoes:"#f1f1f1"},
+  leopard:{torso:"url(#leo)",sleeve:"url(#leo)",pants:"#eee6d8",shoes:"#f1f1f1",det:`<path d="M-34 -204 L30 -118" stroke="#1d1d22" stroke-width="3"/>`},
+  tank:{torso:"#f6f3ec",sleeve:"skin",pants:"#2b2b33",shoes:"#f1f1f1",det:`<path d="M-22 -206 L-20 -222 M22 -206 L20 -222" stroke="#f6f3ec" stroke-width="3"/>`,top:"tank"},
+  bikini:{torso:"skin",sleeve:"skin",skirt:"#f4f1ea",shoes:"none",det:`<path d="M-32 -170 L-6 -170 L-17 -198Z M6 -170 L32 -170 L17 -198Z" fill="#d7332d"/><path d="M-17 -198 L-14 -224 M17 -198 L14 -224 M-32 -172 L-40 -176 M32 -172 L40 -176" stroke="#d7332d" stroke-width="2"/>`},
+  winter:{torso:"#6f6a5c",sleeve:"#6f6a5c",pants:"#2a2a30",shoes:"#e9e3d8",det:`<path d="M-42 -176 Q0 -168 42 -176 M-44 -146 Q0 -138 44 -146 M-40 -122 Q0 -114 40 -122" stroke="#5e594c" stroke-width="3" fill="none"/>`},
+  wedding:{torso:"#fbfaf6",sleeve:"skin",dress:1,shoes:"#fbfaf6",det:`<path d="M-38 -200 Q-20 -212 -10 -198 Q0 -210 10 -198 Q20 -212 38 -200" stroke="#e4ddd0" stroke-width="2" fill="none"/>`}
+};
+// поза руки: [ctrlX, ctrlY, handX, handY] относительно ширины плеч sw (для правой руки)
+const POSE={
+  down:sw=>[sw+16,-160,sw+10,-118], up:sw=>[sw+26,-258,sw+12,-306],
+  hold:sw=>[sw+14,-148,16,-150], hug:sw=>[sw+42,-200,sw+62,-178],
+  waist:sw=>[sw+30,-150,sw+46,-152], phone:sw=>[sw+34,-200,24,-256]
+};
+function person(o){
+  const D=o.who==="d", skin=D?"#f7d3b9":"#f1c4a0", sw=D?40:50, fit=(D?DO:EO)[o.outfit];
+  const col=c=>c==="skin"?skin:c;
+  let s="";
+  if(o.veil) s+=`<path d="M-24 -322 Q-130 -160 -118 0 L118 0 Q130 -160 24 -322Z" fill="#fff" opacity=".5"/>`;
+  if(o.hood) s+=`<ellipse cx="0" cy="-266" rx="64" ry="68" fill="#a9adb6"/>`;
+  if(D&&o.hair==="down") s+=`<path d="M-46 -280 Q-58 -342 0 -340 Q58 -342 46 -280 L58 -172 Q32 -162 8 -174 L-8 -174 Q-32 -162 -58 -172Z" fill="${HAIR_D}"/>`;
+  if(D&&o.hair==="pony") s+=`<path d="M30 -306 Q72 -280 56 -196 Q48 -230 26 -276Z" fill="${HAIR_D}"/>`;
+  // ноги
+  const lw=D?22:28;
+  if(fit.dress){
+    s+=`<path d="M-14 -100 L-16 -10 M14 -100 L16 -10" stroke="${skin}" stroke-width="${lw-2}" stroke-linecap="round"/>`;
+  } else if(fit.skirt){
+    s+=`<path d="M-12 -40 L-14 -10 M12 -40 L14 -10" stroke="${skin}" stroke-width="${lw}" stroke-linecap="round"/><path d="M-38 -118 L38 -118 L54 -28 Q0 -20 -54 -28Z" fill="${fit.skirt}"/><path d="M-20 -110 L-28 -34 M8 -110 L14 -30" stroke="#e2ddd2" stroke-width="2"/>`;
+  } else if(fit.shorts){
+    s+=`<path d="M-18 -112 L-20 -12 M18 -112 L20 -12" stroke="${skin}" stroke-width="${lw}" stroke-linecap="round"/><path d="M-46 -122 L46 -122 L48 -70 L4 -70 L0 -96 L-4 -70 L-48 -70Z" fill="${fit.shorts}"/><path d="M-30 -110 Q-20 -90 -36 -76 M30 -110 Q20 -90 36 -76" stroke="#ffffff66" stroke-width="3" fill="none"/>`;
+  } else {
+    s+=`<path d="M${D?-14:-19} -112 L${D?-15:-21} -12 M${D?14:19} -112 L${D?15:21} -12" stroke="${fit.pants}" stroke-width="${lw}" stroke-linecap="round"/>`;
+  }
+  if(fit.shoes!=="none") s+=`<ellipse cx="${D?-17:-24}" cy="-6" rx="${D?14:18}" ry="8" fill="${fit.shoes}"/><ellipse cx="${D?17:24}" cy="-6" rx="${D?14:18}" ry="8" fill="${fit.shoes}"/>`;
+  else s+=`<ellipse cx="${D?-17:-22}" cy="-7" rx="${D?10:12}" ry="6" fill="${skin}"/><ellipse cx="${D?17:22}" cy="-7" rx="${D?10:12}" ry="6" fill="${skin}"/>`;
+  // шея, торс
+  s+=`<rect x="-11" y="-228" width="22" height="26" fill="${skin}"/>`;
+  const hip=D?sw-4:sw-6;
+  if(fit.top==="tank") s+=`<path d="M${-sw} -206 Q0 -218 ${sw} -206 Q${sw+6} -160 ${hip} -110 Q0 -100 ${-hip} -110 Q${-sw-6} -160 ${-sw} -206Z" fill="${skin}"/><path d="M${-sw+6} -190 Q0 -184 ${sw-6} -190 Q${sw+4} -150 ${hip} -110 Q0 -100 ${-hip} -110 Q${-sw-4} -150 ${-sw+6} -190Z" fill="${fit.torso}"/>`;
+  else if(fit.dress) s+=`<path d="M${-sw} -206 Q0 -218 ${sw} -206 L${sw} -196 Q0 -206 ${-sw} -196Z" fill="${skin}"/><path d="M${-sw+2} -196 Q-20 -208 -10 -194 Q0 -206 10 -194 Q20 -208 ${sw-2} -196 Q${sw+2} -150 ${hip-4} -116 Q0 -108 ${-hip+4} -116 Q${-sw-2} -150 ${-sw+2} -196Z" fill="${fit.torso}"/><path d="M-40 -118 Q-86 -104 -78 -70 Q-72 -46 -40 -54 Q0 -44 40 -54 Q72 -46 78 -70 Q86 -104 40 -118Z" fill="#fbfaf6"/><path d="M-50 -100 Q-40 -76 -56 -62 M0 -112 Q-6 -86 4 -50 M44 -104 Q36 -80 56 -62" stroke="#e4ddd0" stroke-width="2.4" fill="none"/>`;
+  else s+=`<path d="M${-sw} -206 Q0 -218 ${sw} -206 Q${sw+8} -160 ${hip} -110 Q0 -100 ${-hip} -110 Q${-sw-8} -160 ${-sw} -206Z" fill="${col(fit.torso)}"/>`;
+  if(fit.det) s+=fit.det;
+  if(o.pearls) s+=`<path d="M-14 -214 Q0 -200 14 -214" stroke="#fff" stroke-width="5" stroke-dasharray="0.1 6" stroke-linecap="round" fill="none"/><path d="M-17 -210 Q0 -190 17 -210" stroke="#f4efe6" stroke-width="7" stroke-dasharray="0.1 8" stroke-linecap="round" fill="none"/>`;
+  if(o.bag) s+=`<rect x="-38" y="-128" width="76" height="22" rx="10" fill="#1a1a1e"/><path d="M-30 -117 L30 -117" stroke="#3a3a40" stroke-width="2"/>`;
+  // руки
+  [-1,1].forEach((sg,i)=>{
+    const pose=o.arms?.[i]||"down", p=POSE[pose](sw);
+    const S=[sg*(sw-4),-202], C=[sg*p[0],p[1]], H=[sg*p[2],p[3]];
+    const armCol=fit.short?(fit.under||skin):col(fit.sleeve);
+    s+=`<path d="M${S} Q${C} ${H}" stroke="${armCol}" stroke-width="${D?19:23}" fill="none" stroke-linecap="round"/>`;
+    if(fit.short) s+=`<path d="M${S} L${qpt(.36,S,C,H)}" stroke="${col(fit.sleeve)}" stroke-width="${D?24:28}" stroke-linecap="round"/>`;
+    s+=`<circle cx="${H[0]}" cy="${H[1]}" r="${D?9:11}" fill="${skin}"/>`;
+    if(pose==="phone") s+=`<rect x="${H[0]-14}" y="${H[1]-24}" width="22" height="38" rx="5" fill="#16161a"/><circle cx="${H[0]-7}" cy="${H[1]-17}" r="3" fill="#555"/>`;
+    if(o.item&&i===1){
+      if(o.item==="mango") s+=`<rect x="${H[0]-16}" y="${H[1]-8}" width="32" height="20" rx="4" fill="#fff"/><ellipse cx="${H[0]}" cy="${H[1]-10}" rx="16" ry="8" fill="#f6b73c"/><ellipse cx="${H[0]-6}" cy="${H[1]-6}" rx="10" ry="5" fill="#f3f0e6"/>`;
+      if(o.item==="callas") s+=`<path d="M${H[0]} ${H[1]+40} L${H[0]-2} ${H[1]-30} M${H[0]} ${H[1]+40} L${H[0]+12} ${H[1]-26} M${H[0]} ${H[1]+40} L${H[0]-14} ${H[1]-22}" stroke="#4f7d48" stroke-width="3"/><g fill="#fff" stroke="#e7e2d6"><path d="M${H[0]-2} ${H[1]-30} q-8 -14 4 -22 q2 12 -4 22Z"/><path d="M${H[0]+12} ${H[1]-26} q-4 -16 10 -18 q-2 12 -10 18Z"/><path d="M${H[0]-14} ${H[1]-22} q-12 -10 -2 -22 q6 10 2 22Z"/></g>`;
+      if(o.item==="sign") s+=`<rect x="${H[0]-64}" y="${H[1]-50}" width="96" height="46" rx="4" fill="#fffaf2" stroke="#e2574c" stroke-width="3"/><text x="${H[0]-16}" y="${H[1]-20}" text-anchor="middle" font-family="Marck Script, cursive" font-size="22" fill="#e2574c">Даша+Габи</text>`;
+    }
+  });
+  s+= D? dHead(o):eHead(o);
+  return s;
+}
+function eHead(o){
+  const skin="#f1c4a0";
+  let s=`<ellipse cx="-46" cy="-266" rx="8" ry="12" fill="${skin}"/><ellipse cx="46" cy="-266" rx="8" ry="12" fill="${skin}"/><ellipse cx="0" cy="-268" rx="46" ry="53" fill="${skin}"/>`;
+  if(!o.beanie) s+=`<path d="M-46 -268 Q-50 -322 0 -324 Q50 -322 46 -268 Q42 -296 30 -302 Q22 -290 0 -292 Q-22 -290 -30 -302 Q-42 -296 -46 -268Z" fill="${HAIR_E}" opacity=".9"/>`;
+  s+=`<path d="M-45 -270 Q-46 -224 0 -214 Q46 -224 45 -270 Q40 -246 26 -240 Q0 -232 -26 -240 Q-40 -246 -45 -270Z" fill="${BEARD}"/>`;
+  s+=`<path d="M-17 -247 Q0 -256 17 -247 Q0 -243 -17 -247Z" fill="${BEARD}"/><path d="M-11 -242 Q0 -234 11 -242" stroke="#5e331d" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+  s+=`<path d="M-26 -284 Q-16 -289 -7 -284 M7 -284 Q16 -289 26 -284" stroke="#9a7450" stroke-width="3.5" fill="none" stroke-linecap="round"/>`;
+  s+=`<circle cx="-16" cy="-272" r="4.6" fill="#3a5d84"/><circle cx="16" cy="-272" r="4.6" fill="#3a5d84"/><circle cx="-14.5" cy="-273.5" r="1.4" fill="#fff"/><circle cx="17.5" cy="-273.5" r="1.4" fill="#fff"/>`;
+  s+=`<path d="M-3 -262 Q2 -254 6 -259" stroke="#c98e68" stroke-width="2.5" fill="none" stroke-linecap="round"/><ellipse cx="-28" cy="-258" rx="8" ry="5" fill="#f2a08c" opacity=".45"/><ellipse cx="28" cy="-258" rx="8" ry="5" fill="#f2a08c" opacity=".45"/>`;
+  if(o.glasses) s+=`<g stroke="#3a3a42" stroke-width="3" fill="rgba(210,225,255,.25)"><rect x="-34" y="-283" width="26" height="19" rx="4"/><rect x="8" y="-283" width="26" height="19" rx="4"/><path d="M-8 -275 L8 -275 M-34 -276 L-46 -278 M34 -276 L46 -278" fill="none"/></g>`;
+  if(o.sun) s+=`<g fill="#1e2026" stroke="#3a3a42" stroke-width="2.5"><rect x="-36" y="-284" width="30" height="20" rx="5"/><rect x="6" y="-284" width="30" height="20" rx="5"/><path d="M-6 -276 L6 -276 M-36 -277 L-46 -279 M36 -277 L46 -279" fill="none"/></g><path d="M-30 -280 L-22 -270" stroke="#ffffff55" stroke-width="2"/>`;
+  if(o.beanie) s+=`<path d="M-48 -282 Q-52 -342 0 -342 Q52 -342 48 -282 Q0 -296 -48 -282Z" fill="#1d1e22"/><path d="M-49 -282 Q0 -296 49 -282 L49 -298 Q0 -312 -49 -298Z" fill="#2c2d33"/>`;
+  return s;
+}
+function dHead(o){
+  const skin="#f7d3b9";
+  let s=`<ellipse cx="-40" cy="-264" rx="6" ry="10" fill="${skin}"/><ellipse cx="40" cy="-264" rx="6" ry="10" fill="${skin}"/><circle cx="-40" cy="-254" r="2.6" fill="#d9b24c"/><circle cx="40" cy="-254" r="2.6" fill="#d9b24c"/>`;
+  s+=`<ellipse cx="0" cy="-266" rx="41" ry="49" fill="${skin}"/>`;
+  // волосы спереди
+  s+=`<path d="M-42 -272 Q-44 -324 0 -324 Q44 -324 42 -272 Q38 -302 2 -306 Q-38 -302 -42 -272Z" fill="${HAIR_D}"/>`;
+  if(o.hair==="down") s+=`<path d="M-4 -318 Q-44 -314 -46 -262 Q-48 -232 -42 -210 Q-38 -262 -16 -298Z" fill="${HAIR_D}"/><path d="M4 -318 Q44 -314 46 -262 Q48 -232 42 -210 Q38 -262 16 -298Z" fill="${HAIR_D}"/>`;
+  if(o.hair==="bun") s+=`<circle cx="0" cy="-330" r="17" fill="${HAIR_D}"/><path d="M-10 -334 Q0 -342 10 -332" stroke="#5f3a22" stroke-width="2" fill="none"/>`;
+  if(o.hair==="wedding") s+=`<ellipse cx="-30" cy="-300" rx="18" ry="14" fill="${HAIR_D}"/><path d="M-38 -282 Q-52 -250 -40 -226 Q-30 -206 -42 -186" stroke="${HAIR_D}" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M34 -284 Q46 -258 38 -236" stroke="${HAIR_D}" stroke-width="4" fill="none" stroke-linecap="round"/>`;
+  // лицо
+  s+=`<path d="M-24 -282 Q-15 -288 -6 -283 M6 -283 Q15 -288 24 -282" stroke="#6b4329" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+  [-15,15].forEach(x=>{s+=`<ellipse cx="${x}" cy="-268" rx="4.6" ry="5.4" fill="#4b5a62"/><circle cx="${x+1.6}" cy="-270" r="1.5" fill="#fff"/><path d="M${x-7} -273 Q${x} -277 ${x+7} -272" stroke="#2f221c" stroke-width="2.2" fill="none" stroke-linecap="round"/>`});
+  s+=`<path d="M-2 -260 Q2 -253 5 -257" stroke="#d29a7a" stroke-width="2.2" fill="none" stroke-linecap="round"/>`;
+  s+=`<path d="M-12 -244 Q0 -231 12 -244Z" fill="#b84d4d"/><path d="M-11 -244 Q0 -240 11 -244 L10 -242 Q0 -237 -10 -242Z" fill="#fff"/>`;
+  s+=`<ellipse cx="-25" cy="-254" rx="8" ry="5" fill="#f29c96" opacity=".5"/><ellipse cx="25" cy="-254" rx="8" ry="5" fill="#f29c96" opacity=".5"/>`;
+  s+=`<g fill="#cf9273"><circle cx="-22" cy="-258" r="1"/><circle cx="-17" cy="-255" r="1"/><circle cx="-25" cy="-252" r="1"/><circle cx="20" cy="-257" r="1"/><circle cx="25" cy="-253" r="1"/><circle cx="17" cy="-253" r="1"/></g>`;
+  if(o.hat==="bandana") s+=`<path d="M-45 -286 Q-50 -340 0 -340 Q50 -340 45 -286 Q0 -302 -45 -286Z" fill="url(#pais)"/><path d="M40 -300 L60 -290 L50 -306Z M40 -300 L58 -310 L44 -314Z" fill="#c22b26"/>`;
+  if(o.hat==="beanie") s+=`<path d="M-47 -280 Q-52 -350 0 -350 Q52 -350 47 -280 Q0 -294 -47 -280Z" fill="#a89c8e"/><g stroke="#968a7c" stroke-width="2.5">${[-36,-24,-12,0,12,24,36].map(x=>`<path d="M${x} -${x===0?344:338} L${x} -${290+Math.abs(x)/6}"/>`).join("")}</g><path d="M-48 -280 Q0 -294 48 -280 L48 -298 Q0 -312 -48 -298Z" fill="#b5aa9c"/>`;
+  return s;
+}
+function gabi(o={}){
+  const fur="#d9a26a", furL="#ecc391", furD="#bb8450";
+  const fill={pink:"#f28fb6",floral:"url(#flor)",stripe:"url(#stripe)"}[o.outfit||"pink"];
+  let s=`<circle cx="-32" cy="-34" r="13" fill="${fur}"/><ellipse cx="0" cy="-40" rx="34" ry="38" fill="${fur}"/><ellipse cx="-24" cy="-12" rx="16" ry="12" fill="${fur}"/><ellipse cx="24" cy="-12" rx="16" ry="12" fill="${fur}"/>`;
+  s+=`<path d="M-30 -70 Q0 -80 30 -70 Q42 -42 34 -24 Q0 -16 -34 -24 Q-42 -42 -30 -70Z" fill="${fill}"/>`;
+  if(o.outfit==="stripe") s+=`<rect x="-14" y="-66" width="28" height="44" fill="#f6c9d3"/><path d="M-26 -70 Q0 -60 26 -70" stroke="#7a4a2c" stroke-width="5" fill="none"/>`;
+  if((o.outfit||"pink")==="pink") s+=`<path d="M-26 -70 Q0 -52 26 -70" stroke="#e5729c" stroke-width="9" fill="none" stroke-linecap="round"/>`;
+  s+=`<rect x="-18" y="-44" width="14" height="38" rx="6" fill="${fur}"/><rect x="4" y="-44" width="14" height="38" rx="6" fill="${fur}"/>`;
+  if((o.outfit||"pink")==="pink") s+=`<rect x="-19" y="-46" width="16" height="20" rx="5" fill="#f28fb6"/><rect x="3" y="-46" width="16" height="20" rx="5" fill="#f28fb6"/>`;
+  s+=`<ellipse cx="-11" cy="-6" rx="10" ry="7" fill="${furL}"/><ellipse cx="11" cy="-6" rx="10" ry="7" fill="${furL}"/>`;
+  s+=`<circle cx="0" cy="-94" r="34" fill="${fur}"/><circle cx="-18" cy="-122" r="12" fill="${fur}"/><circle cx="0" cy="-128" r="13" fill="${fur}"/><circle cx="18" cy="-122" r="12" fill="${fur}"/>`;
+  s+=`<ellipse cx="-34" cy="-86" rx="14" ry="27" fill="${furD}" transform="rotate(14 -34 -86)"/><ellipse cx="34" cy="-86" rx="14" ry="27" fill="${furD}" transform="rotate(-14 34 -86)"/>`;
+  s+=`<ellipse cx="0" cy="-78" rx="18" ry="14" fill="${furL}"/><circle cx="-12" cy="-96" r="5.5" fill="#1b1411"/><circle cx="12" cy="-96" r="5.5" fill="#1b1411"/><circle cx="-10.5" cy="-98" r="1.7" fill="#fff"/><circle cx="13.5" cy="-98" r="1.7" fill="#fff"/>`;
+  s+=`<ellipse cx="0" cy="-85" rx="6.5" ry="5" fill="#5a3a30"/><path d="M-5 -74 Q0 -70 5 -74" stroke="#8a5a40" stroke-width="2" fill="none" stroke-linecap="round"/>`;
+  if(o.sun) s+=`<g fill="#1e2026"><rect x="-24" y="-104" width="20" height="14" rx="4"/><rect x="4" y="-104" width="20" height="14" rx="4"/><rect x="-4" y="-99" width="8" height="3"/></g>`;
+  return s;
+}
+const E=(x,y,s,o)=>G(x,y,s,person({who:"e",...o}));
+const Dg=(x,y,s,o)=>G(x,y,s*0.9,person({who:"d",...o}));
+const Gb=(x,y,s,o)=>G(x,y,s,gabi(o));
+
+// ===== Сценки =====
+const SCENES=[
+  {title:"Закат на смотровой", draw:()=>{
+    const d=grad("sk",[[0,"#f39a5b"],[.55,"#f9c97c"],[1,"#fde7b0"]])+grad("sea",[[0,"#f2bf7a"],[1,"#9a7f8e"]]);
+    let b=`<rect width="900" height="600" fill="url(#sk)"/><circle cx="430" cy="300" r="120" fill="#fff4cf" opacity=".35"/><circle cx="430" cy="300" r="52" fill="#fff3c4"/><rect y="350" width="900" height="250" fill="url(#sea)"/>`;
+    b+=`<path d="M0 352 L0 300 Q60 280 120 330 L180 352Z" fill="#4c3a52"/><path d="M640 352 Q720 300 800 320 Q860 330 900 300 L900 352Z" fill="#4c3a52"/>`;
+    for(let i=0;i<6;i++) b+=`<rect x="${410-i*4}" y="${364+i*18}" width="${40+i*8}" height="4" fill="#fff3c4" opacity=".55"/>`;
+    b+=`<path d="M0 470 Q200 430 420 470 Q650 510 900 450 L900 600 L0 600Z" fill="#3f6b3a"/><circle cx="90" cy="470" r="60" fill="#4f7d45"/><circle cx="170" cy="490" r="50" fill="#5a8a4e"/>`;
+    b+=palm(790,600,300,-1,"#2d5a37","#5b3f2c");
+    b+=Dg(370,598,1.15,{outfit:"leopard",hair:"down",hat:"bandana",arms:["up","down"]});
+    b+=E(500,598,1.15,{outfit:"tropic",beanie:1,sun:1,arms:["waist","down"]});
+    b+=Gb(640,588,1,{outfit:"pink"});
+    return [d,b];
+  }},
+  {title:"Пока между нами 5000 км", draw:()=>{
+    const d=grad("w",[[0,"#aebdcd"],[1,"#e6ecf2"]])+grad("t",[[0,"#7fd3e6"],[1,"#fff0c8"]]);
+    let b=`<rect width="450" height="600" fill="url(#w)"/><rect x="40" y="170" width="110" height="360" fill="#b45a3c"/><rect x="170" y="250" width="90" height="280" fill="#c07052"/>`;
+    for(let r=0;r<11;r++)for(let c=0;c<3;c++) b+=`<rect x="${54+c*32}" y="${185+r*30}" width="18" height="16" fill="#e9eef3" opacity=".85"/>`;
+    for(let r=0;r<8;r++)for(let c=0;c<2;c++) b+=`<rect x="${186+c*34}" y="${264+r*32}" width="18" height="16" fill="#e9eef3" opacity=".85"/>`;
+    b+=`<path d="M0 520 Q220 500 450 525 L450 600 L0 600Z" fill="#fbfdff"/>`+snow(7,0,450,0,560,60);
+    b+=`<rect x="450" width="450" height="600" fill="url(#t)"/><circle cx="800" cy="110" r="44" fill="#fff1c0"/><rect x="450" y="410" width="450" height="90" fill="#2bb3b1"/><path d="M450 500 Q680 480 900 495 L900 600 L450 600Z" fill="#f3d9a8"/>`;
+    b+=palm(860,600,330,-1);
+    b+=`<path d="M230 120 Q450 10 660 120" stroke="#2b2340" stroke-width="3" stroke-dasharray="10 10" fill="none" opacity=".45"/><text x="450" y="58" text-anchor="middle" font-size="34">✈</text>`+heart(450,90,1.4,"#e2574c");
+    b+=`<text x="225" y="40" text-anchor="middle" font-family="Manrope, sans-serif" font-weight="700" font-size="20" fill="#2b2340">Иркутск, −15°</text><text x="675" y="40" text-anchor="middle" font-family="Manrope, sans-serif" font-weight="700" font-size="20" fill="#2b2340">Раваи, +31°</text>`;
+    b+=Dg(200,592,1.05,{outfit:"winter",hair:"down",hat:"beanie",arms:["down","up"]});
+    b+=Gb(330,585,.95,{outfit:"pink"});
+    b+=E(650,592,1.05,{outfit:"tropic",sun:1,arms:["up","down"]});
+    return [d,b];
+  }},
+  {title:"У бассейна, коктейль с жёлтой трубочкой", draw:()=>{
+    let b=`<rect width="900" height="600" fill="#c9a37c"/>`;
+    for(let r=0;r<3;r++){b+=`<rect x="0" y="${30+r*90}" width="900" height="10" fill="#b48a62"/><path d="M60 ${90+r*90} L840 ${90+r*90}" stroke="#f3eee6" stroke-width="3"/>`;for(let x=60;x<840;x+=26) b+=`<path d="M${x} ${66+r*90} L${x} ${90+r*90}" stroke="#f3eee6" stroke-width="2"/>`;}
+    b+=palm(120,330,250,1)+palm(720,330,240,-1);
+    b+=`<rect y="300" width="900" height="160" fill="#bfe0dc"/><path d="M220 300 L220 460 M440 300 L440 460 M660 300 L660 460" stroke="#a9cdc8" stroke-width="3"/>`;
+    b+=`<rect y="455" width="640" height="145" fill="#3cc7d0"/><rect x="640" y="440" width="260" height="160" fill="#b8916a"/><path d="M640 470 L900 470 M640 510 L900 510 M640 550 L900 550" stroke="#a37e58" stroke-width="2"/>`;
+    b+=E(250,600,1.1,{outfit:"swim",arms:["down","hold"]});
+    b+=Dg(400,600,1.1,{outfit:"bikini",hair:"bun",arms:["hold","down"]});
+    b+=`<rect y="462" width="640" height="138" fill="#33bfc9" opacity=".86"/>`;
+    for(let i=0;i<5;i++) b+=`<path d="M${20+i*130} ${500+(i%2)*40} q20 -8 40 0 q20 8 40 0" stroke="#ffffff99" stroke-width="3" fill="none"/>`;
+    b+=`<path d="M560 420 L600 420 L594 458 L566 458Z" fill="#ffffffcc" stroke="#d9e5e6"/><rect x="566" y="432" width="28" height="24" fill="#f59a3c" opacity=".8"/><path d="M588 458 L604 396" stroke="#f2cf2c" stroke-width="5" stroke-linecap="round"/>`;
+    b+=`<rect x="690" y="420" width="190" height="22" rx="8" fill="#5b4a3e"/><path d="M700 442 L700 470 M870 442 L870 470" stroke="#5b4a3e" stroke-width="6"/>`;
+    b+=Gb(780,422,.95,{outfit:"floral",sun:1});
+    return ["",b];
+  }},
+  {title:"Вечер на диване. Гусь тоже с нами", draw:()=>{
+    let b=`<rect width="900" height="600" fill="#efe2d2"/><rect y="520" width="900" height="80" fill="#cdb69a"/><rect x="620" y="70" width="150" height="110" rx="4" fill="#f7efe4" stroke="#c8b49a" stroke-width="6"/><path d="M640 160 Q690 100 750 160" fill="#9fc6b8"/><circle cx="725" cy="105" r="14" fill="#f5c26b"/>`;
+    b+=`<path d="M60 520 L60 250 M30 250 L90 250 L74 200 L46 200Z" stroke="#8b7a68" stroke-width="5" fill="#f3d9a0"/>`;
+    b+=`<rect x="130" y="290" width="660" height="190" rx="36" fill="#a8957f"/>`;
+    b+=Dg(330,600,1.1,{outfit:"tank",hair:"pony",arms:["down","hold"]});
+    b+=E(570,600,1.1,{outfit:"tee",glasses:1,arms:["hold","down"]});
+    b+=`<rect y="530" width="900" height="70" fill="#cdb69a"/>`;
+    b+=`<rect x="110" y="440" width="700" height="100" rx="22" fill="#b9a68f"/><rect x="90" y="360" width="70" height="180" rx="30" fill="#a8957f"/><rect x="760" y="360" width="70" height="180" rx="30" fill="#a8957f"/>`;
+    b+=Gb(450,456,.9,{outfit:"stripe"});
+    b+=`<ellipse cx="700" cy="420" rx="56" ry="38" fill="#fbfbf7"/><circle cx="660" cy="384" r="24" fill="#fbfbf7"/><path d="M640 384 L596 392 L640 400Z" fill="#f2a43a"/><circle cx="656" cy="378" r="3" fill="#222"/>`;
+    return ["",b];
+  }},
+  {title:"Катаемся по Раваи", draw:()=>{
+    const d=grad("sky2",[[0,"#8fd3f4"],[1,"#eaf8ff"]]);
+    let b=`<rect width="900" height="600" fill="url(#sky2)"/><circle cx="140" cy="100" r="40" fill="#fff4c8"/><path d="M0 330 Q150 250 320 310 Q480 230 640 300 Q780 250 900 300 L900 360 L0 360Z" fill="#6aa86a"/><rect y="350" width="900" height="50" fill="#2fb3c3"/><rect y="400" width="900" height="200" fill="#8e8e96"/>`;
+    for(let x=20;x<900;x+=120) b+=`<rect x="${x}" y="520" width="60" height="8" fill="#f2f2f2"/>`;
+    b+=palm(60,420,220,1)+palm(860,420,240,-1);
+    b+=Dg(380,528,1.05,{outfit:"leopard",hair:"down",hat:"bandana",arms:["down","down"]});
+    b+=E(470,528,1.05,{outfit:"tropic",sun:1,arms:["down","hug"]});
+    b+=`<path d="M300 520 Q300 460 360 452 L560 452 Q600 452 610 400 L630 360 L650 362 L632 470 Q630 520 600 530 L330 530Z" fill="#7fd1c0"/><path d="M360 452 L520 452 L512 430 L370 430Z" fill="#3b3b42"/><path d="M640 362 L580 346" stroke="#2b2b30" stroke-width="7" stroke-linecap="round"/>`;
+    b+=Gb(670,402,.75,{outfit:"pink"});
+    b+=`<path d="M626 380 L716 380 L706 420 L636 420Z" fill="#c99a5b"/><path d="M630 392 L712 392 M634 404 L710 404" stroke="#a87b40" stroke-width="2"/>`;
+    b+=`<circle cx="350" cy="540" r="40" fill="#26262c"/><circle cx="350" cy="540" r="16" fill="#9a9aa2"/><circle cx="610" cy="540" r="40" fill="#26262c"/><circle cx="610" cy="540" r="16" fill="#9a9aa2"/>`;
+    b+=`<path d="M120 470 L230 470 M90 500 L210 500" stroke="#ffffffaa" stroke-width="5" stroke-linecap="round"/>`;
+    return [d,b];
+  }},
+  {title:"Пляжный волейбол. Группа поддержки на месте", draw:()=>{
+    let b=`<rect width="900" height="600" fill="#bfe6f5"/><rect y="300" width="900" height="80" fill="#2bb3b1"/><rect y="380" width="900" height="220" fill="#f3d9a8"/>`;
+    b+=`<path d="M620 560 L620 250 M880 560 L880 250" stroke="#6b5240" stroke-width="8"/><rect x="620" y="258" width="260" height="56" fill="none" stroke="#fff" stroke-width="3"/>`;
+    for(let x=640;x<880;x+=20) b+=`<path d="M${x} 258 L${x} 314" stroke="#ffffffaa" stroke-width="1.5"/>`;
+    b+=`<path d="M620 286 L880 286" stroke="#ffffffaa" stroke-width="1.5"/><ellipse cx="460" cy="582" rx="60" ry="10" fill="#d5b880"/>`;
+    b+=E(460,530,1.05,{outfit:"swim",arms:["up","up"]});
+    b+=`<circle cx="460" cy="130" r="34" fill="#f6e05a"/><path d="M430 116 Q460 130 490 116 M436 150 Q460 132 484 152 M460 96 Q448 130 460 164" stroke="#2f7fb8" stroke-width="4" fill="none"/><path d="M380 140 L410 140 M372 170 L404 166" stroke="#2b2340" stroke-width="3" stroke-linecap="round" opacity=".5"/>`;
+    b+=Dg(200,590,1.05,{outfit:"bikini",hair:"down",hat:"bandana",arms:["up","up"]});
+    b+=Gb(320,586,.95,{outfit:"pink"})+`<text x="365" y="548" font-family="Unbounded, sans-serif" font-weight="700" font-size="28" fill="#e2574c">гав!</text>`;
+    return ["",b];
+  }},
+  {title:"Ужин у моря. Габи просит кусочек", draw:()=>{
+    const d=grad("ev",[[0,"#5e56a0"],[.6,"#f2967a"],[1,"#ffd29a"]]);
+    let b=`<rect width="900" height="600" fill="url(#ev)"/><circle cx="450" cy="372" r="56" fill="#ffe1a8"/><rect y="372" width="900" height="228" fill="#4f5d96"/>`;
+    b+=`<path d="M0 60 Q225 120 450 70 Q675 120 900 60" stroke="#2b2340" stroke-width="2" fill="none"/>`;
+    for(let i=0;i<14;i++){const x=20+i*64, y=60+Math.abs(Math.sin(i*Math.PI/7))*44; b+=`<circle cx="${x}" cy="${y.toFixed(0)}" r="7" fill="#ffe6a1"/><circle cx="${x}" cy="${y.toFixed(0)}" r="14" fill="#ffe6a1" opacity=".3"/>`;}
+    b+=Dg(340,600,1.1,{outfit:"tank",hair:"down",arms:["down","hold"]});
+    b+=E(560,600,1.1,{outfit:"tropic",arms:["hold","down"]});
+    b+=`<path d="M200 440 L700 440 L720 600 L180 600Z" fill="#fbf7ef"/><path d="M200 440 L700 440" stroke="#e8e0d0" stroke-width="4"/>`;
+    b+=`<ellipse cx="350" cy="460" rx="54" ry="12" fill="#fff" stroke="#e2dccf"/><ellipse cx="340" cy="452" rx="22" ry="9" fill="#f6b73c"/><ellipse cx="364" cy="455" rx="18" ry="8" fill="#f3f0e6"/>`;
+    b+=`<ellipse cx="550" cy="460" rx="54" ry="12" fill="#fff" stroke="#e2dccf"/><ellipse cx="540" cy="452" rx="22" ry="9" fill="#f6b73c"/><ellipse cx="564" cy="455" rx="18" ry="8" fill="#f3f0e6"/>`;
+    b+=`<rect x="444" y="400" width="12" height="44" fill="#fff"/><path d="M450 384 q-8 10 0 16 q8 -6 0 -16Z" fill="#ffb03a"/>`;
+    b+=Gb(790,595,1,{outfit:"floral"})+heart(800,450,1.3,"#e2574c");
+    return [d,b];
+  }},
+  {title:"Классика: селфи в лифте", draw:()=>{
+    const d=grad("st",[[0,"#8e949b"],[.3,"#dfe3e7"],[.55,"#a3a9b0"],[.8,"#e4e7ea"],[1,"#8e949b"]],1);
+    let b=`<rect width="900" height="600" fill="url(#st)"/><path d="M300 0 L300 600 M600 0 L600 600" stroke="#7d838b" stroke-width="3"/><rect x="0" y="0" width="900" height="56" fill="#3d4148"/>`;
+    for(let x=60;x<900;x+=110) b+=`<path d="M${x} 0 L${x+70} 56" stroke="#dbe7f0" stroke-width="10" opacity=".7"/>`;
+    b+=`<rect x="20" y="180" width="54" height="200" rx="6" fill="#6f747c"/>`;for(let i=0;i<6;i++) b+=`<circle cx="47" cy="${210+i*28}" r="9" fill="#c9cdd2"/>`;
+    b+=`<rect x="720" y="170" width="110" height="150" fill="#f3f3f5" stroke="#9aa0a7" stroke-width="6"/><text x="775" y="235" text-anchor="middle" font-family="Manrope, sans-serif" font-weight="700" font-size="15" fill="#5b4a8a">UP TO</text><text x="775" y="262" text-anchor="middle" font-family="Manrope, sans-serif" font-weight="700" font-size="15" fill="#5b4a8a">6 PEOPLE</text>`;
+    b+=`<rect y="540" width="900" height="60" fill="#7d838b"/>`;
+    b+=E(470,596,1.12,{outfit:"tropic",bag:1,arms:["down","down"]});
+    b+=Dg(330,596,1.12,{outfit:"bikini",hair:"down",hat:"bandana",arms:["down","phone"]});
+    b+=Gb(620,592,.95,{outfit:"stripe"});
+    return [d,b];
+  }},
+  {title:"Ночной рынок: манго и фонарики", draw:()=>{
+    const d=grad("ng",[[0,"#1b2145"],[1,"#4a3768"]]);
+    let b=`<rect width="900" height="600" fill="url(#ng)"/>`+snow(3,0,900,0,200,25).replaceAll("#fff","#fff7d6");
+    const cols=["#ff7a59","#ffd166","#f28fb6","#7fd1c0","#ffb03a"];
+    for(let i=0;i<12;i++){const x=40+i*75,y=110+(i%2)*26;b+=`<path d="M${x} ${y-30} L${x} ${y-14}" stroke="#2b2340" stroke-width="2"/><circle cx="${x}" cy="${y}" r="30" fill="${cols[i%5]}" opacity=".3"/><ellipse cx="${x}" cy="${y}" rx="16" ry="18" fill="${cols[i%5]}"/>`;}
+    b+=`<path d="M0 80 Q450 120 900 80" stroke="#2b2340" stroke-width="2" fill="none"/>`;
+    [[60,"#e2574c"],[330,"#2bb3b1"],[600,"#f2a43a"]].forEach(([x,c])=>{b+=`<path d="M${x} 330 L${x+120} 280 L${x+240} 330Z" fill="${c}"/><rect x="${x+10}" y="330" width="220" height="140" fill="#5a3e33"/><rect x="${x+10}" y="400" width="220" height="16" fill="#8a6650"/>`;});
+    b+=`<rect y="470" width="900" height="130" fill="#3a2f45"/>`;
+    b+=Dg(360,596,1.12,{outfit:"leopard",hair:"down",hat:"bandana",arms:["down","hold"],item:"mango"});
+    b+=E(520,596,1.12,{outfit:"tropic",arms:["down","hold"],item:"mango"});
+    b+=Gb(660,590,.95,{outfit:"floral"});
+    return [d,b];
+  }},
+  {title:"Как в тот самый день", draw:()=>{
+    const d=grad("gl",[[0,"#fff2c4"],[1,"#fff2c400"]],1);
+    let b=`<rect width="900" height="600" fill="#26402a"/>`;const r=rng(11);
+    for(let i=0;i<90;i++) b+=`<circle cx="${(r()*900).toFixed(0)}" cy="${(r()*600).toFixed(0)}" r="${(16+r()*30).toFixed(0)}" fill="${["#2f5a35","#3b6b3f","#4d7d48","#24452a"][i%4]}"/>`;
+    b+=`<rect width="900" height="600" fill="url(#gl)" opacity=".35"/><rect y="560" width="900" height="40" fill="#cbb48f"/>`;
+    b+=Dg(400,596,1.15,{outfit:"wedding",hair:"wedding",veil:1,pearls:1,arms:["down","hold"],item:"callas"});
+    b+=E(530,596,1.15,{outfit:"suit",arms:["waist","down"]});
+    b+=Gb(680,592,.95,{outfit:"floral"});
+    const p=rng(5);for(let i=0;i<14;i++) b+=`<ellipse cx="${(p()*900).toFixed(0)}" cy="${(p()*520).toFixed(0)}" rx="6" ry="3.5" fill="#fff" opacity=".85"/>`;
+    return [d,b];
+  }},
+  {title:"Иркутск, −25. Скоро только воспоминание", draw:()=>{
+    let b=`<rect width="900" height="600" fill="#c6d0da"/><rect x="560" y="60" width="180" height="480" fill="#b45a3c"/><rect x="740" y="200" width="140" height="340" fill="#d6dde3"/>`;
+    for(let r=0;r<14;r++)for(let c=0;c<4;c++) b+=`<rect x="${574+c*42}" y="${78+r*32}" width="22" height="18" fill="#e9eef3"/>`;
+    for(let r=0;r<10;r++)for(let c=0;c<3;c++) b+=`<rect x="${754+c*42}" y="${214+r*32}" width="28" height="20" fill="#f2f5f8" stroke="#aab4be"/>`;
+    b+=`<path d="M0 540 Q450 510 900 540 L900 600 L0 600Z" fill="#fbfdff"/>`+snow(21,0,900,0,560,90);
+    b+=Dg(300,596,1.15,{outfit:"winter",hair:"down",hat:"beanie",arms:["down","waist"]});
+    b+=E(440,596,1.15,{outfit:"winter",hood:1,arms:["waist","down"]});
+    b+=Gb(160,590,.95,{outfit:"pink"});
+    return ["",b];
+  }}
+];
+const ARRIVED_SCENE={title:"Наконец-то вместе", draw:()=>{
+  let b=`<rect width="900" height="600" fill="#e9f1f6"/><rect x="40" y="40" width="820" height="300" fill="#bfe3f2" stroke="#9fb3c2" stroke-width="8"/><path d="M290 40 L290 340 M600 40 L600 340" stroke="#9fb3c2" stroke-width="6"/>`;
+  b+=`<text x="700" y="160" font-size="90">✈</text><rect y="340" width="900" height="260" fill="#d9d2c6"/><rect x="60" y="64" width="200" height="54" rx="6" fill="#2b2340"/><text x="160" y="100" text-anchor="middle" font-family="Unbounded, sans-serif" font-weight="700" font-size="22" fill="#ffd166">HKT ARRIVALS</text>`;
+  b+=Dg(380,596,1.15,{outfit:"leopard",hair:"down",hat:"bandana",arms:["down","waist"]});
+  b+=E(500,596,1.15,{outfit:"tropic",arms:["waist","up"]});
+  b+=`<rect x="140" y="440" width="90" height="130" rx="12" fill="#e2574c"/><rect x="170" y="410" width="30" height="34" rx="6" fill="none" stroke="#2b2340" stroke-width="6"/>`;
+  b+=G(640,560,1,gabi({outfit:"pink"}))+`<path d="M600 590 L620 572 M680 590 L660 572" stroke="#2b2340" stroke-width="3" opacity=".4"/>`;
+  [[300,120],[440,90],[560,140],[700,260]].forEach(([x,y],i)=>b+=heart(x,y,2+i%2,"#e2574c"));
+  return ["",b];
+}};
+const TOMORROW_SCENE={...SCENES[1], title:"Завтра. Самолётик почти долетел"};
+
+function renderScene(sc){
+  const [defs,body]=sc.draw();
+  document.getElementById("art").innerHTML=`<svg viewBox="0 0 900 600" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice"><defs>${PAT}${defs}</defs>${body}</svg>`;
+  document.getElementById("scene").textContent=sc.title;
+}
+
+// ===== Отсчёт и навигация =====
+let todayIdx=0, viewIdx=null, lastDay=null;
+function showCard(idx){
+  const now=new Date(), arrived=ARRIVAL<=now, days=Math.max(0,tzDay(ARRIVAL)-tzDay(now));
+  const isToday=idx===todayIdx;
+  let sc=SCENES[idx%SCENES.length], msg=MESSAGES[idx%MESSAGES.length];
+  if(isToday&&arrived){sc=ARRIVED_SCENE;msg="Ты прилетела. Всё, больше никаких обратных отсчётов. Добро пожаловать домой, мои девочки.";}
+  else if(isToday&&days===0){sc=ARRIVED_SCENE;msg="Сегодня. Я уже в аэропорту и, кажется, улыбаюсь всем подряд.";}
+  else if(isToday&&days===1){sc=TOMORROW_SCENE;msg="Завтра. Последняя ночь врозь. Спи сладко, увидимся совсем скоро.";}
+  const pic=IMAGES[idx+1];
+  if(pic){
+    document.getElementById("art").innerHTML=`<img src="${pic.src}" alt="${pic.title}">`;
+    document.getElementById("scene").textContent=pic.title;
+  } else renderScene(sc);
+  document.getElementById("msg").textContent=msg;
+  document.getElementById("no").textContent=idx+1;
+  const d=new Date(START.getTime()+idx*DAY);
+  document.getElementById("today").textContent=d.toLocaleDateString("ru-RU",{day:"numeric",month:"long",timeZone:"Asia/Bangkok"});
+  document.getElementById("prev").disabled=idx<=0;
+  document.getElementById("next").disabled=idx>=todayIdx;
+}
+document.getElementById("prev").onclick=()=>{viewIdx=Math.max(0,viewIdx-1);showCard(viewIdx)};
+document.getElementById("next").onclick=()=>{viewIdx=Math.min(todayIdx,viewIdx+1);showCard(viewIdx)};
+
+function tick(){
+  const now=new Date(), ms=ARRIVAL-now, arrived=ms<=0;
+  const dToday=tzDay(now), days=Math.max(0,tzDay(ARRIVAL)-dToday);
+  const progress=Math.min(1,Math.max(0,(now-START)/(ARRIVAL-START)));
+  document.getElementById("days").textContent=arrived?"0":days;
+  document.getElementById("daysLabel").textContent=arrived?"Мы вместе ❤":days===0?"Сегодня! Ну наконец-то":plural(days,"день","дня","дней")+" до встречи";
+  const left=Math.max(0,ms);
+  document.getElementById("h").textContent=String(Math.floor(left/36e5)%24).padStart(2,"0");
+  document.getElementById("m").textContent=String(Math.floor(left/6e4)%60).padStart(2,"0");
+  document.getElementById("s").textContent=String(Math.floor(left/1e3)%60).padStart(2,"0");
+  const pct=Math.round(progress*100);
+  document.getElementById("pct").textContent=pct+"% пути";
+  document.getElementById("fill").style.width=pct+"%";
+  document.getElementById("plane").style.left=Math.min(97,Math.max(3,pct))+"%";
+  if(dToday!==lastDay){
+    lastDay=dToday;
+    todayIdx=Math.max(0,dToday-tzDay(START));
+    viewIdx=todayIdx; showCard(todayIdx);
+  }
+}
+tick(); setInterval(tick,1000);
+</script>
+</body>
+</html>
