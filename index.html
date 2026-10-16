@@ -160,7 +160,7 @@ footer{text-align:center;font-size:12px;color:var(--ink-soft)}
 // ===== Настройки =====
 const TEST = location.hash==="#zhenya-test"; // тестовый режим
 const ARRIVAL = new Date("2026-12-05T12:00:00+07:00"); // дата приезда (время Пхукета)
-const START   = new Date("2026-10-16T00:00:00+07:00"); // день запуска странички
+const START   = new Date("2026-10-15T00:00:00+08:00"); // день запуска странички
 
 const MESSAGES = [
   "Смотрю на ту же луну, что и ты. Значит, мы не так уж далеко друг от друга.",
@@ -227,7 +227,7 @@ const IMAGES = {
 
 // ===== Утилиты =====
 const DAY = 864e5;
-const tzDay = (d) => Math.floor((d.getTime() + 7*3600e3) / DAY);
+const tzDay = (d) => Math.floor((d.getTime() + 8*3600e3) / DAY); // день по Иркутску
 function plural(n, one, few, many){
   const a=Math.abs(n)%100,b=a%10;
   if(a>10&&a<20) return many; if(b>1&&b<5) return few; if(b===1) return one; return many;
@@ -778,7 +778,7 @@ function showCard(idx){
   } else showOpen();
   document.getElementById("no").textContent=idx+1;
   const d=new Date(START.getTime()+idx*DAY);
-  document.getElementById("today").textContent=d.toLocaleDateString("ru-RU",{day:"numeric",month:"long",timeZone:"Asia/Bangkok"});
+  document.getElementById("today").textContent=d.toLocaleDateString("ru-RU",{day:"numeric",month:"long",timeZone:"Asia/Irkutsk"});
   document.getElementById("prev").disabled=idx<=0;
   document.getElementById("next").disabled=idx>=(TEST?LAST_IDX:todayIdx);
 }
