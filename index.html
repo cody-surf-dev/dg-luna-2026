@@ -80,9 +80,25 @@ header{text-align:center;display:flex;flex-direction:column;gap:6px}
 .lockimg{filter:blur(14px) saturate(.8);transform:scale(1.1)}
 .lockbadge{position:absolute;inset:0;display:grid;place-items:center;font:700 15px var(--f-display);color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.4)}
 .mem{position:absolute;inset:0;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(3,1fr);gap:6px;padding:8px;background:var(--paper)}
-.mem button{border:0;border-radius:8px;background:linear-gradient(135deg,#7fa6d6,#ff9a6b);color:transparent;font-size:clamp(20px,6vw,34px);cursor:pointer;transition:transform .2s,background .2s}
-.mem button.up,.mem button.ok{background:#fff;color:inherit;box-shadow:inset 0 0 0 1.5px var(--line)}
+.mem button{-webkit-appearance:none;appearance:none;padding:0;border:0;border-radius:8px;background:linear-gradient(135deg,#7fa6d6,#ff9a6b);font-size:clamp(20px,6vw,34px);line-height:1;cursor:pointer;transition:background .2s}
+.mem button span{opacity:0;transition:opacity .15s}
+.mem button.up,.mem button.ok{background:#fff;box-shadow:inset 0 0 0 1.5px var(--line)}
+.mem button.up span,.mem button.ok span{opacity:1}
 .mem button.ok{opacity:.55}
+.gbox{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:8px;background:rgba(255,250,242,.86);text-align:center}
+.gbox .big2{font:700 clamp(15px,4.4vw,20px) var(--f-display);color:var(--ink)}
+.gbox .row{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.gb{-webkit-appearance:none;appearance:none;font:700 clamp(16px,5vw,22px) var(--f-body);color:var(--ink);background:#fff;border:1.5px solid var(--line);border-radius:10px;min-width:44px;min-height:44px;padding:4px 10px;cursor:pointer;line-height:1}
+.gb:disabled{opacity:.35}
+.gb.lit{background:#ffe1a8;border-color:#f2a43a;transform:scale(1.08)}
+.ttt{display:grid;grid-template-columns:repeat(3,clamp(44px,13vw,60px));gap:5px}
+.ttt .gb{height:clamp(44px,13vw,60px);font-size:clamp(20px,6vw,28px)}
+.heartdot{position:absolute;font-size:30px;line-height:1;border:0;background:none;cursor:pointer;padding:6px;animation:pop .25s ease-out}
+@keyframes pop{from{transform:scale(.2)}to{transform:scale(1)}}
+.findgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;width:100%;max-width:340px}
+.findgrid .gb{min-width:0;padding:4px 0;font-size:clamp(18px,5.4vw,26px)}
+.rot{transition:transform .2s}
+
 .nav{display:flex;gap:6px}
 .nav button{font:600 12px var(--f-body);color:var(--ink);background:transparent;border:1px solid var(--line);border-radius:99px;padding:5px 11px;cursor:pointer}
 .nav button:disabled{opacity:.35;cursor:default}
@@ -602,7 +618,7 @@ const QUIZ=[
 const MISS=["Мимо! 😏","Не-а! Женя обиделся бы, но он добрый 😄","Холодно, как в Иркутске ❄","Почти! Ну, нет, совсем не почти 😅"];
 function gameFor(i){
   if(i%2===1 && (i-1)/2<QUIZ.length) return {type:"quiz",q:QUIZ[(i-1)/2]};
-  return {type:["puzzle","scratch","memory"][Math.floor(i/2)%3]};
+  return {type:GAMES[Math.floor(i/2)%GAMES.length]};
 }
 function quizGame(src,win,hint,q,seed){
   const art=document.getElementById("art"),box=document.getElementById("quiz");
@@ -625,15 +641,110 @@ function memory(src,win,hint){
   hint.hidden=false;hint.innerHTML="<span>Найди все пары: открывай по две карточки</span>";
   art.innerHTML=`<img src="${src}" alt=""><div class="mem" id="mem"></div>`;
   const m=document.getElementById("mem");let open=[],found=0,busy=false;
-  deck.forEach((ic,k)=>{const b=document.createElement("button");b.type="button";b.textContent=ic;b.setAttribute("aria-label","Карточка "+(k+1));
+  deck.forEach((ic,k)=>{const b=document.createElement("button");b.type="button";b.dataset.ic=ic;b.innerHTML="<span>"+ic+"</span>";b.setAttribute("aria-label","Карточка "+(k+1));
     b.onclick=()=>{if(busy||b.classList.contains("up")||b.classList.contains("ok"))return;b.classList.add("up");open.push(b);
       if(open.length===2){busy=true;const [x,y]=open;
-        setTimeout(()=>{if(x.textContent===y.textContent){x.classList.replace("up","ok");y.classList.replace("up","ok");found++;
+        setTimeout(()=>{if(x.dataset.ic===y.dataset.ic){x.classList.replace("up","ok");y.classList.replace("up","ok");found++;
           if(found===icons.length){hint.innerHTML="<span>Все пары найдены! ❤</span>";m.style.transition="opacity .6s";m.style.opacity="0";win();}}
           else{x.classList.remove("up");y.classList.remove("up");}open=[];busy=false;},650);}};
     m.appendChild(b);});
 }
 const LAST_IDX=tzDay(ARRIVAL)-tzDay(START);
+
+// ===== Ещё игры =====
+function boxed(src,html){const art=document.getElementById("art");art.innerHTML=`<img class="lockimg" src="${src}" alt=""><div class="gbox">${html}</div>`;return art.querySelector(".gbox");}
+function shuffle(a,r=Math.random){for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function catchHearts(src,win,hint){
+  const need=10;let got=0,alive=true;
+  hint.hidden=false;hint.innerHTML="<span>Лови сердечки! Нажимай на них, пока не исчезли</span>";
+  const art=document.getElementById("art");art.innerHTML=`<img class="lockimg" src="${src}" alt=""><div class="gbox" style="justify-content:flex-start"><div class="big2">Поймано: <span id="hc">0</span> / ${need}</div></div>`;
+  const box=art.querySelector(".gbox");
+  const spawn=()=>{if(!alive||!document.body.contains(box))return;const h=document.createElement("button");h.type="button";h.className="heartdot";h.textContent=["❤️","💛","💖"][Math.floor(Math.random()*3)];
+    h.style.left=(5+Math.random()*78)+"%";h.style.top=(22+Math.random()*58)+"%";
+    h.onclick=()=>{h.remove();got++;document.getElementById("hc").textContent=got;if(got>=need){alive=false;win();}};
+    box.appendChild(h);setTimeout(()=>h.remove(),1300);setTimeout(spawn,650);};
+  spawn();
+}
+function anagram(src,win,hint,seed){
+  const W=["ГАБИ","МАНГО","ПХУКЕТ","РАВАИ","ДЖЕНИ","ОБНИМУ","ЛЮБЛЮ","НАЙХАРН","ВОЛЕЙБОЛ"];
+  const w=W[Math.floor(seed/2)%W.length];let built="";
+  hint.hidden=false;hint.innerHTML="<span>Собери слово про нас: нажимай буквы по порядку</span>";
+  const box=boxed(src,`<div class="big2" id="aw">${"_ ".repeat(w.length).trim()}</div><div class="row" id="al"></div><div class="fb" id="afb" style="font-size:13px;color:#e2574c;font-weight:600"></div>`);
+  let letters;do{letters=shuffle([...w])}while(letters.join("")===w);
+  const show=()=>{document.getElementById("aw").textContent=[...w].map((c,i)=>i<built.length?built[i]:"_").join(" ");};
+  const row=document.getElementById("al");
+  letters.forEach(c=>{const b=document.createElement("button");b.type="button";b.className="gb";b.textContent=c;
+    b.onclick=()=>{if(w[built.length]===c){built+=c;b.disabled=true;show();if(built===w)win();}
+      else{document.getElementById("afb").textContent="Не та буква, попробуй другую 🙂";}};
+    row.appendChild(b);});
+}
+function rotateGame(src,win,hint){
+  const art=document.getElementById("art");
+  hint.hidden=false;hint.innerHTML="<span>Поверни кусочки: нажимай, пока картинка не встанет ровно</span>";
+  art.innerHTML=`<div class="game" id="game"></div>`;const g=document.getElementById("game");
+  const rot=[...Array(9)].map(()=>[90,180,270,0][Math.floor(Math.random()*4)]);if(rot.every(r=>r===0))rot[4]=90;
+  rot.forEach((r,i)=>{const b=document.createElement("button");b.type="button";b.className="tile rot";b.setAttribute("aria-label","Кусочек "+(i+1));
+    b.style.backgroundImage=`url("${src}")`;b.style.backgroundPosition=`${(i%3)*50}% ${Math.floor(i/3)*50}%`;b.style.transform=`rotate(${r}deg)`;
+    b.onclick=()=>{rot[i]=(rot[i]+90)%360;b.style.transform=`rotate(${rot[i]===0?0:rot[i]}deg)`;if(rot.every(x=>x===0)){art.classList.add("solved");win();}};
+    g.appendChild(b);});
+}
+function ticTacToe(src,win,hint){
+  hint.hidden=false;hint.innerHTML="<span>Крестики-нолики против Габи. Ты ❤️, Габи 🐾. Не проиграй!</span>";
+  const box=boxed(src,`<div class="ttt" id="tt"></div><div class="big2" id="tm" style="font-size:14px"></div>`);
+  let b=Array(9).fill(""),over=false;const L=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+  const wins=p=>L.some(l=>l.every(i=>b[i]===p));
+  const pick=()=>{for(const p of ["🐾","❤️"])for(const l of L){const v=l.map(i=>b[i]);if(v.filter(x=>x===p).length===2&&v.includes(""))return l[v.indexOf("")];}
+    if(b[4]==="")return 4;const f=b.map((v,i)=>v?null:i).filter(x=>x!==null);return f[Math.floor(Math.random()*f.length)];};
+  const draw=()=>{const t=document.getElementById("tt");t.innerHTML="";b.forEach((v,i)=>{const c=document.createElement("button");c.type="button";c.className="gb";c.textContent=v;c.disabled=!!v||over;
+    c.onclick=()=>{b[i]="❤️";if(wins("❤️")){over=true;draw();document.getElementById("tm").textContent="Победа! 🎉";win();return;}
+      if(b.every(x=>x)){over=true;draw();document.getElementById("tm").textContent="Ничья — тоже победа ❤";win();return;}
+      b[pick()]="🐾";if(wins("🐾")){over=true;draw();document.getElementById("tm").textContent="Габи выиграла! Реванш…";setTimeout(()=>{b=Array(9).fill("");over=false;document.getElementById("tm").textContent="";draw();},1500);return;}
+      draw();};t.appendChild(c);});};
+  draw();
+}
+function rps(src,win,hint){
+  hint.hidden=false;hint.innerHTML="<span>Камень-ножницы-бумага с Габи. Играем до двух побед!</span>";
+  const box=boxed(src,`<div class="big2" id="rs">Ты 0 : 0 Габи</div><div class="row" id="rb"></div><div style="font-size:14px;font-weight:600" id="rm">Выбирай!</div>`);
+  const M=["✊","✌️","✋"],N=["камень","ножницы","бумага"];let me=0,gb=0;
+  M.forEach((m,i)=>{const b=document.createElement("button");b.type="button";b.className="gb";b.textContent=m;b.setAttribute("aria-label",N[i]);
+    b.onclick=()=>{if(me>=2)return;const g=Math.floor(Math.random()*3);let t;
+      if(g===i)t="Ничья, Габи тоже выбрала "+M[g];else if((i+1)%3===g){me++;t="Габи: "+M[g]+". Твоё очко!";}else{gb++;t="Габи: "+M[g]+". Очко Габи 🐾";}
+      document.getElementById("rs").textContent=`Ты ${me} : ${gb} Габи`;document.getElementById("rm").textContent=t;
+      if(me>=2){document.getElementById("rm").textContent="Ты победила! 🎉";win();}
+      else if(gb>=2){document.getElementById("rm").textContent="Габи победила 😼 Начинаем заново!";me=0;gb=0;setTimeout(()=>{document.getElementById("rs").textContent="Ты 0 : 0 Габи"},1200);}};
+    document.getElementById("rb").appendChild(b);});
+}
+function simon(src,win,hint,seed){
+  const P=["🌴","🐶","❤️","🥭"],r=rng(seed*13+5),seq=[...Array(4)].map(()=>Math.floor(r()*4));let pos=0,busy=true;
+  hint.hidden=false;hint.innerHTML="<span>Запомни порядок, в котором загораются значки, и повтори</span>";
+  const box=boxed(src,`<div class="row" id="sp"></div><div style="font-size:14px;font-weight:600" id="sm">Смотри внимательно…</div>`);
+  const btns=P.map((p,i)=>{const b=document.createElement("button");b.type="button";b.className="gb";b.textContent=p;b.style.fontSize="30px";b.style.minWidth="60px";b.style.minHeight="60px";
+    b.onclick=()=>{if(busy)return;flash(i,250);if(i===seq[pos]){pos++;if(pos===seq.length){busy=true;document.getElementById("sm").textContent="Идеально! 🎉";win();}}
+      else{busy=true;document.getElementById("sm").textContent="Не тот! Покажу ещё раз…";setTimeout(play,900);}};
+    document.getElementById("sp").appendChild(b);return b;});
+  function flash(i,ms){btns[i].classList.add("lit");setTimeout(()=>btns[i].classList.remove("lit"),ms);}
+  function play(){busy=true;pos=0;document.getElementById("sm").textContent="Смотри внимательно…";
+    seq.forEach((v,k)=>setTimeout(()=>flash(v,450),700+k*700));setTimeout(()=>{busy=false;document.getElementById("sm").textContent="Теперь ты!";},700+seq.length*700);}
+  play();
+}
+function findGabi(src,win,hint){
+  const D=["🦊","🐱","🐻","🐹","🐰","🐨","🐯","🐼"];let round=0;
+  hint.hidden=false;hint.innerHTML="<span>Найди Габи 🐶 среди зверят. Три раунда!</span>";
+  const box=boxed(src,`<div class="big2" id="fr">Раунд 1 из 3</div><div class="findgrid" id="fg"></div>`);
+  const go=()=>{const g=document.getElementById("fg");g.innerHTML="";const n=18,t=Math.floor(Math.random()*n);
+    for(let i=0;i<n;i++){const b=document.createElement("button");b.type="button";b.className="gb";b.textContent=i===t?"🐶":D[Math.floor(Math.random()*D.length)];
+      b.onclick=()=>{if(i===t){round++;if(round>=3){document.getElementById("fr").textContent="Нашла! 🎉";win();}else{document.getElementById("fr").textContent=`Раунд ${round+1} из 3`;go();}}else{b.disabled=true;}};g.appendChild(b);}};
+  go();
+}
+function pump(src,win,hint){
+  const need=25;let n=0;
+  hint.hidden=false;hint.innerHTML="<span>Картинка в тумане. Жми на сердце, чтобы его развеять!</span>";
+  const art=document.getElementById("art");art.innerHTML=`<img id="pimg" src="${src}" alt="" style="filter:blur(22px);transform:scale(1.1);transition:filter .2s"><div class="gbox" style="background:transparent"><button type="button" class="gb" id="pb" style="font-size:44px;min-width:90px;min-height:90px;border-radius:50%">❤️</button><div class="big2" id="pc" style="text-shadow:0 1px 6px #fff">0 / ${need}</div></div>`;
+  document.getElementById("pb").onclick=e=>{n++;const b=e.currentTarget;b.style.transform="scale(1.15)";setTimeout(()=>b.style.transform="",100);
+    document.getElementById("pc").textContent=`${n} / ${need}`;document.getElementById("pimg").style.filter=`blur(${Math.max(0,22*(1-n/need))}px)`;
+    if(n>=need){art.querySelector(".gbox").remove();win();}};
+}
+const GAMES=["puzzle","catch","scratch","anagram","memory","ttt","rotate","rps","simon","find","pump"];
 function showCard(idx){
   const now=new Date();
   let arrived=ARRIVAL<=now, days=Math.max(0,tzDay(ARRIVAL)-tzDay(now));
@@ -663,9 +774,7 @@ function showCard(idx){
     const win=()=>{markSolved(idx);celebrate();setTimeout(()=>{if(viewIdx===idx)showOpen()},900);};
     const g=gameFor(idx);
     if(g.type==="quiz") quizGame(src,win,hint,g.q,idx);
-    else if(g.type==="puzzle") puzzle(src,win,hint);
-    else if(g.type==="memory") memory(src,win,hint);
-    else scratch(src,win,hint);
+    else ({puzzle,scratch,memory,catch:catchHearts,anagram,ttt:ticTacToe,rotate:rotateGame,rps,simon,find:findGabi,pump})[g.type](src,win,hint,idx);
   } else showOpen();
   document.getElementById("no").textContent=idx+1;
   const d=new Date(START.getTime()+idx*DAY);
