@@ -4,6 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Cache-Control" content="no-cache">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Даша и Габи">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-180.png">
+<link rel="manifest" href="manifest.json">
 <title>Даша и Габи едут</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marck+Script&family=Unbounded:wght@500;700&family=Manrope:wght@400;600;700&display=swap">
 <style>
@@ -617,7 +625,8 @@ const QUIZ=[
 ];
 const MISS=["Мимо! 😏","Не-а! Женя обиделся бы, но он добрый 😄","Холодно, как в Иркутске ❄","Почти! Ну, нет, совсем не почти 😅"];
 function gameFor(i){
-  if(i%2===1 && (i-1)/2<QUIZ.length) return {type:"quiz",q:QUIZ[(i-1)/2]};
+  if(i===1) return {type:"pump"};
+  if(i%2===1 && i>=3 && (i-3)/2<QUIZ.length) return {type:"quiz",q:QUIZ[(i-3)/2]};
   return {type:GAMES[Math.floor(i/2)%GAMES.length]};
 }
 function quizGame(src,win,hint,q,seed){
@@ -807,6 +816,12 @@ function tick(){
 }
 if(TEST){const f=document.getElementById("foot");f.textContent="Тестовый режим: листай все дни, прогресс игр не сохраняется";f.style.color="#e2574c";f.style.fontWeight="700";}
 tick(); setInterval(tick,1000);
+// автообновление: если на сайте вышла новая версия, страница перезагрузится сама
+const PAGE_VER="1792161993";
+async function checkVer(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});const v=(await r.text()).trim();if(v&&v!==PAGE_VER)location.reload();}catch(e){}}
+document.addEventListener("visibilitychange",()=>{if(!document.hidden){checkVer();tick();}});
+window.addEventListener("pageshow",checkVer);
+setInterval(checkVer,10*60*1000);
 </script>
 </body>
 </html>
