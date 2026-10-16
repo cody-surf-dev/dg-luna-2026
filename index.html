@@ -167,7 +167,12 @@ const MESSAGES = [
 
 // Картинки из Gemini: номер открытки → файл и подпись
 const IMAGES = {
-  1: {src:"img/01.jpg", title:"Одна луна на двоих"}
+  1: {src:"img/01.jpg", title:"Одна луна на двоих"},
+  2: {src:"img/02.jpg", title:"Вечерний созвон", msg:"Твоё лицо на экране — лучшая часть моего дня. Габи, тебе тоже привет."},
+  3: {src:"img/03.jpg", title:"Утро в двух мирах", msg:"Ты чистишь машину от снега, я пью кофе у моря. Скоро будем пить кофе вместе."},
+  4: {src:"img/04.jpg", title:"Габи ждёт у двери", msg:"Габи, потерпи ещё чуть-чуть. Скоро этот поводок поведёт тебя на пляж."},
+  5: {src:"img/05.jpg", title:"Волейбол по видеосвязи", msg:"Лучшая группа поддержки на свете, даже через полмира."},
+  6: {src:"img/06.jpg", title:"Снеговик и замок из песка", msg:"Ты лепишь снеговика, я строю замок. Скоро будем строить что-то одно на двоих."}
 };
 
 // ===== Утилиты =====
@@ -498,6 +503,7 @@ function showCard(idx){
   if(pic){
     document.getElementById("art").innerHTML=`<img src="${pic.src}" alt="${pic.title}">`;
     document.getElementById("scene").textContent=pic.title;
+    if(pic.msg && !(isToday&&(arrived||days<=1))) msg=pic.msg;
   } else renderScene(sc);
   document.getElementById("msg").textContent=msg;
   document.getElementById("no").textContent=idx+1;
