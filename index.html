@@ -70,6 +70,19 @@ header{text-align:center;display:flex;flex-direction:column;gap:6px}
 .msg.locked{color:var(--ink-soft);filter:blur(5px);user-select:none}
 .burst{position:absolute;pointer-events:none;font-size:22px;animation:fly 1.4s ease-out forwards}
 @keyframes fly{from{opacity:1;transform:translate(0,0) scale(.6)}to{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.3)}}
+.quiz{display:flex;flex-direction:column;gap:10px;padding:0 6px}
+.quiz .q{font:700 16px/1.35 var(--f-body);color:var(--ink);text-wrap:balance}
+.quiz .opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.quiz .opts button{font:600 14px/1.3 var(--f-body);color:var(--ink);background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:10px 8px;cursor:pointer;text-align:center;min-height:48px}
+.quiz .opts button.no{border-color:#e7b1ad;color:#b9524b;text-decoration:line-through;opacity:.7}
+.quiz .opts button.yes{border-color:#2bb3b1;background:#e6f7f5}
+.quiz .fb{font-size:13px;color:var(--stamp);font-weight:600;min-height:1.2em}
+.lockimg{filter:blur(14px) saturate(.8);transform:scale(1.1)}
+.lockbadge{position:absolute;inset:0;display:grid;place-items:center;font:700 15px var(--f-display);color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.4)}
+.mem{position:absolute;inset:0;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(3,1fr);gap:6px;padding:8px;background:var(--paper)}
+.mem button{border:0;border-radius:8px;background:linear-gradient(135deg,#7fa6d6,#ff9a6b);color:transparent;font-size:clamp(20px,6vw,34px);cursor:pointer;transition:transform .2s,background .2s}
+.mem button.up,.mem button.ok{background:#fff;color:inherit;box-shadow:inset 0 0 0 1.5px var(--line)}
+.mem button.ok{opacity:.55}
 .nav{display:flex;gap:6px}
 .nav button{font:600 12px var(--f-body);color:var(--ink);background:transparent;border:1px solid var(--line);border-radius:99px;padding:5px 11px;cursor:pointer}
 .nav button:disabled{opacity:.35;cursor:default}
@@ -102,6 +115,7 @@ footer{text-align:center;font-size:12px;color:var(--ink-soft)}
     <div class="art" id="art" role="img" aria-label="Открытка дня"></div>
     <div class="scene" id="scene"></div>
     <div class="hint" id="hint" hidden></div>
+    <div class="quiz" id="quiz" hidden></div>
     <div class="back">
       <div>
         <div class="msg" id="msg"></div>
@@ -557,6 +571,65 @@ function scratch(src,win,hint){
   cv.addEventListener("pointerup",()=>{down=false;check();});
   document.getElementById("skipS").onclick=finish;
 }
+
+// ===== Вопросы про Женю: [вопрос, правильный, неправильные...] =====
+const QUIZ=[
+ ["Где мы познакомились?","На волейболе","В кафе","В университете","В спортзале"],
+ ["Каким было наше первое свидание?","Просто гуляли вечером","Сходили в кино","Ужин в ресторане","Каток"],
+ ["Что я чаще всего заказываю в кафе?","Пиво","Капучино","Лимонад","Зелёный чай"],
+ ["Моё любимое блюдо, которое готовит Даша?","Борщ","Пельмени","Плов","Сырники"],
+ ["Что я терпеть не могу из еды?","Ничего, я ем всё","Кинзу","Оливки","Грибы"],
+ ["Мой любимый фильм?","«Никогда не сдавайся»","«Форсаж»","«Мальчишник в Вегасе»","«Брат 2»"],
+ ["Какую игру я обожаю?","Mobile Legends: Bang Bang","Clash Royale","Dota 2","PUBG Mobile"],
+ ["Кто такой Коди?","«Коди — это я, бро. Дайте мне быть собой»","Кот соседей","Мой тренер по волейболу","Ник в покере"],
+ ["Чем я занимаюсь по утрам на Пхукете?","Катаю 😎","Медитирую на пляже","Сплю до обеда","Бегаю 10 км"],
+ ["Как я тебя называю?","Джени","Зайка","Дашуля","Солнце"],
+ ["Как я называю Габи?","Малышок","Пушок","Булочка","Габриэлла"],
+ ["Куда было наше первое совместное путешествие?","Таиланд","Байкал","Сочи","Турция"],
+ ["Что я делаю, когда нервничаю?","Ору как бешеный","Молча ем","Ухожу гулять","Залипаю в телефон"],
+ ["Моя самая странная привычка?","Быть честным","Спать в носках","Считать ступеньки","Разговаривать с Габи как с человеком"],
+ ["Чего я боюсь?","Насекомых","Высоты","Темноты","Уколов"],
+ ["О чём я мечтаю?","Чтобы мои любимые были здоровы и счастливы","Выиграть миллион в покер","Стать чемпионом по волейболу","Купить яхту"],
+ ["Какую песню я пою в душе или в машине?","Mattafix — Big City Life","Imagine Dragons — Believer","Король и Шут — Лесник","Coldplay — Viva la Vida"],
+ ["Что я сделал, когда впервые увидел Габи?","Обнял","Сфоткал","Спросил «это что, хомяк?»","Чихнул"],
+ ["Мой любимый цвет?","Чёрный","Синий","Зелёный","Белый"],
+ ["Сколько чашек кофе я пью в день?","Одну","Ни одной","Три","Пять"],
+ ["Что я сделаю первым делом, когда ты прилетишь?","Обниму и поцелую","Поведу есть","Покажу квартиру","Сфоткаю для истории"],
+ ["Куда я хочу сводить тебя на Пхукете в первую очередь?","Пляж Найхарн","Пхукет-таун","Патонг","Большой Будда"],
+ ["Наша фраза, понятная только нам?","«Да, они все долбоебы»","«Ну всё, поехали»","«Это база»","«Мы просто красивые»"]
+];
+const MISS=["Мимо! Подумай ещё 😏","Не-а. Женя обиделся бы, но он добрый 😄","Холодно, как в Иркутске ❄","Почти! Ну, нет, совсем не почти 😅"];
+function gameFor(i){
+  if(i%2===1 && (i-1)/2<QUIZ.length) return {type:"quiz",q:QUIZ[(i-1)/2]};
+  return {type:["puzzle","scratch","memory"][Math.floor(i/2)%3]};
+}
+function quizGame(src,win,hint,q,seed){
+  const art=document.getElementById("art"),box=document.getElementById("quiz");
+  art.innerHTML=`<img class="lockimg" src="${src}" alt=""><div class="lockbadge">🔒 Ответь на вопрос</div>`;
+  hint.hidden=false;hint.innerHTML="<span>Сегодня открытка откроется, если ты хорошо знаешь Женю 😉</span>";
+  const r=rng(seed*31+7);const opts=q.slice(1).map((t,k)=>({t,ok:k===0,o:r()})).sort((a,b)=>a.o-b.o);
+  box.hidden=false;box.innerHTML=`<div class="q">${q[0]}</div><div class="opts"></div><div class="fb" aria-live="polite"></div>`;
+  const wrap=box.querySelector(".opts"),fb=box.querySelector(".fb");let miss=0;
+  opts.forEach(o=>{const b=document.createElement("button");b.type="button";b.textContent=o.t;
+    b.onclick=()=>{if(o.ok){b.classList.add("yes");fb.textContent="Правильно! ❤";setTimeout(()=>{box.hidden=true;win();},500);}
+      else{b.classList.add("no");b.disabled=true;fb.textContent=MISS[miss++%MISS.length];}};
+    wrap.appendChild(b);});
+}
+function memory(src,win,hint){
+  const art=document.getElementById("art");
+  const icons=["🌴","🐶","❤️","🥭","🏐","✈️"];let deck=[...icons,...icons];
+  for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]]}
+  hint.hidden=false;hint.innerHTML="<span>Найди все пары: открывай по две карточки</span>";
+  art.innerHTML=`<img src="${src}" alt=""><div class="mem" id="mem"></div>`;
+  const m=document.getElementById("mem");let open=[],found=0,busy=false;
+  deck.forEach((ic,k)=>{const b=document.createElement("button");b.type="button";b.textContent=ic;b.setAttribute("aria-label","Карточка "+(k+1));
+    b.onclick=()=>{if(busy||b.classList.contains("up")||b.classList.contains("ok"))return;b.classList.add("up");open.push(b);
+      if(open.length===2){busy=true;const [x,y]=open;
+        setTimeout(()=>{if(x.textContent===y.textContent){x.classList.replace("up","ok");y.classList.replace("up","ok");found++;
+          if(found===icons.length){hint.innerHTML="<span>Все пары найдены! ❤</span>";m.style.transition="opacity .6s";m.style.opacity="0";win();}}
+          else{x.classList.remove("up");y.classList.remove("up");}open=[];busy=false;},650);}};
+    m.appendChild(b);});
+}
 function showCard(idx){
   const now=new Date(), arrived=ARRIVAL<=now, days=Math.max(0,tzDay(ARRIVAL)-tzDay(now));
   const isToday=idx===todayIdx;
@@ -577,11 +650,16 @@ function showCard(idx){
   }
   const msgEl=document.getElementById("msg"), hint=document.getElementById("hint");
   msgEl.textContent=msg;
+  document.getElementById("quiz").hidden=true;
   const showOpen=()=>{document.getElementById("art").innerHTML=`<img src="${src}" alt="">`;msgEl.classList.remove("locked");hint.hidden=true;};
-  if(isToday && !arrived && !isSolved(idx)){
+  if(isToday && !arrived && days>0 && !isSolved(idx)){
     msgEl.classList.add("locked");
-    const win=()=>{markSolved(idx);celebrate();setTimeout(showOpen,900);};
-    if(idx%2===0) puzzle(src,win,hint); else scratch(src,win,hint);
+    const win=()=>{markSolved(idx);celebrate();setTimeout(()=>{if(viewIdx===idx)showOpen()},900);};
+    const g=gameFor(idx);
+    if(g.type==="quiz") quizGame(src,win,hint,g.q,idx);
+    else if(g.type==="puzzle") puzzle(src,win,hint);
+    else if(g.type==="memory") memory(src,win,hint);
+    else scratch(src,win,hint);
   } else showOpen();
   document.getElementById("no").textContent=idx+1;
   const d=new Date(START.getTime()+idx*DAY);
