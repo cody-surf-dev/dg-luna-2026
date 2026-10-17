@@ -230,8 +230,7 @@ const IMAGES = {
   8: {src:"img/08.jpg", title:"Прогулка по набережной", msg:"Передай набережной привет. Скоро будете с Габи гулять вдоль моря."},
   9: {src:"img/09.jpg", title:"Сериал и покер", msg:"Ты с сериалом, я с покером, а машем друг другу всё равно. Скоро будем на одном диване."},
   10: {src:"img/10.jpg", title:"Сердце на песке", msg:"Волна смоет, а я нарисую снова. Каждый вечер, пока ты не приедешь."},
-  11: {src:"img/11.jpg", title:"Какао и снежинки", msg:"Грейся какао и передай Габи, что снежинки — это тренировка перед морскими брызгами."},
-  21: {src:"img/21.jpg", title:"Утро в двух мирах", msg:"Ты чистишь машину от снега, я пью кофе у моря. Скоро будем пить кофе вместе."}
+  11: {src:"img/11.jpg", title:"Какао и снежинки", msg:"Грейся какао и передай Габи, что снежинки — это тренировка перед морскими брызгами."}
 };
 
 // ===== Утилиты =====
@@ -818,7 +817,7 @@ function tick(){
 if(TEST){const f=document.getElementById("foot");f.textContent="Тестовый режим: листай все дни, прогресс игр не сохраняется";f.style.color="#e2574c";f.style.fontWeight="700";}
 tick(); setInterval(tick,1000);
 // автообновление: если на сайте вышла новая версия, страница перезагрузится сама
-const PAGE_VER="1792203944";
+const PAGE_VER="1792204009";
 async function checkVer(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});const v=(await r.text()).trim();if(v&&v!==PAGE_VER)location.reload();}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden){checkVer();tick();}});
 window.addEventListener("pageshow",checkVer);
