@@ -166,6 +166,7 @@ footer{text-align:center;font-size:12px;color:var(--ink-soft)}
 
 <script>
 // ===== Настройки =====
+const PAGE_VER="1792665652";
 const TEST = location.hash==="#zhenya-test"; // тестовый режим
 const ARRIVAL = new Date("2026-12-05T12:00:00+07:00"); // дата приезда (время Пхукета)
 const START   = new Date("2026-10-15T06:00:00+08:00"); // день запуска странички
@@ -767,7 +768,7 @@ function showCard(idx){
   const pic=IMAGES[idx+1];
   let src;
   if(pic){
-    src=pic.src;
+    src=pic.src+"?v="+PAGE_VER;
     document.getElementById("scene").textContent=pic.title;
     if(pic.msg && !(isToday&&(arrived||days<=1))) msg=pic.msg;
   } else {
@@ -818,7 +819,6 @@ function tick(){
 if(TEST){const f=document.getElementById("foot");f.textContent="Тестовый режим: листай все дни, прогресс игр не сохраняется";f.style.color="#e2574c";f.style.fontWeight="700";}
 tick(); setInterval(tick,1000);
 // автообновление: если на сайте вышла новая версия, страница перезагрузится сама
-const PAGE_VER="1792665493";
 async function checkVer(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});const v=(await r.text()).trim();if(v&&v!==PAGE_VER)location.reload();}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden){checkVer();tick();}});
 window.addEventListener("pageshow",checkVer);
