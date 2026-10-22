@@ -228,7 +228,7 @@ const IMAGES = {
   6: {src:"img/06.jpg", title:"Снеговик и замок из песка", msg:"Ты лепишь снеговика, я строю замок. Скоро будем строить что-то одно на двоих."},
   7: {src:"img/07.jpg", title:"Манго для Даши", msg:"Выбрал самое красивое манго и сразу сфоткал тебе. Скоро будешь выбирать сама."},
   8: {src:"img/08.jpg", title:"Прогулка по набережной", msg:"Передай набережной привет. Скоро будете с Габи гулять вдоль моря."},
-  9: {src:"img/09.jpg", title:"Сериал и покер", msg:"Ты с сериалом, я с покером, а машем друг другу всё равно. Скоро будем на одном диване."},
+  9: {src:"img/09.jpg", title:"Сериал и покер", msg:"Ты с сериалом, я с покером. У меня для тебя тайм-код: «Реальные пацаны», 2 сезон, 28 серия, 43:20. Включи — это от меня 😉"},
   10: {src:"img/10.jpg", title:"Сердце на песке", msg:"Волна смоет, а я нарисую снова. Каждый вечер, пока ты не приедешь."},
   11: {src:"img/11.jpg", title:"Какао и снежинки", msg:"Грейся какао и передай Габи, что снежинки — это тренировка перед морскими брызгами."}
 };
@@ -817,7 +817,7 @@ function tick(){
 if(TEST){const f=document.getElementById("foot");f.textContent="Тестовый режим: листай все дни, прогресс игр не сохраняется";f.style.color="#e2574c";f.style.fontWeight="700";}
 tick(); setInterval(tick,1000);
 // автообновление: если на сайте вышла новая версия, страница перезагрузится сама
-const PAGE_VER="1792204009";
+const PAGE_VER="1792665169";
 async function checkVer(){try{const r=await fetch("version.txt?t="+Date.now(),{cache:"no-store"});const v=(await r.text()).trim();if(v&&v!==PAGE_VER)location.reload();}catch(e){}}
 document.addEventListener("visibilitychange",()=>{if(!document.hidden){checkVer();tick();}});
 window.addEventListener("pageshow",checkVer);
