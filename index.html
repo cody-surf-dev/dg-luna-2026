@@ -107,6 +107,9 @@ header{text-align:center;display:flex;flex-direction:column;gap:6px}
 .findgrid .gb{min-width:0;padding:4px 0;font-size:clamp(18px,5.4vw,26px)}
 .rot{transition:transform .2s}
 
+.art video{width:100%;height:100%;display:block;object-fit:cover;background:#000}
+.playbtn{position:absolute;inset:0;margin:auto;width:84px;height:84px;border-radius:50%;border:0;background:rgba(255,250,242,.92);color:var(--stamp);font-size:34px;cursor:pointer;box-shadow:0 8px 30px rgba(0,0,0,.35);padding-left:6px}
+.playlabel{position:absolute;left:0;right:0;bottom:12px;text-align:center;font:700 14px var(--f-body);color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.6)}
 .nav{display:flex;gap:6px}
 .nav button{font:600 12px var(--f-body);color:var(--ink);background:transparent;border:1px solid var(--line);border-radius:99px;padding:5px 11px;cursor:pointer}
 .nav button:disabled{opacity:.35;cursor:default}
@@ -166,7 +169,7 @@ footer{text-align:center;font-size:12px;color:var(--ink-soft)}
 
 <script>
 // ===== Настройки =====
-const PAGE_VER="1792665652";
+const PAGE_VER="1792666172";
 const TEST = location.hash==="#zhenya-test"; // тестовый режим
 const ARRIVAL = new Date("2026-12-05T12:00:00+07:00"); // дата приезда (время Пхукета)
 const START   = new Date("2026-10-15T06:00:00+08:00"); // день запуска странички
@@ -229,7 +232,7 @@ const IMAGES = {
   6: {src:"img/06.jpg", title:"Снеговик и замок из песка", msg:"Ты лепишь снеговика, я строю замок. Скоро будем строить что-то одно на двоих."},
   7: {src:"img/07.jpg", title:"Манго для Даши", msg:"Выбрал самое красивое манго и сразу сфоткал тебе. Скоро будешь выбирать сама."},
   8: {src:"img/08.jpg", title:"Прогулка по набережной", msg:"Передай набережной привет. Скоро будете с Габи гулять вдоль моря."},
-  9: {src:"img/09.jpg", title:"Серенада для Даши", msg:"Специально отрастил усы и надел костюм 🎤 Тайм-код для тебя: «Реальные пацаны», 2 сезон, 28 серия, 43:20. Включай — это я тебе пою ❤"},
+  9: {src:"img/09.jpg", video:"img/09.mp4", title:"Серенада для Даши", msg:"Даша, это посвящается тебе. Ты моя королева вдохновения 🎤 А оригинал — «Реальные пацаны», 2 сезон, 28 серия, 43:20 ❤"},
   10: {src:"img/10.jpg", title:"Сердце на песке", msg:"Волна смоет, а я нарисую снова. Каждый вечер, пока ты не приедешь."},
   11: {src:"img/11.jpg", title:"Какао и снежинки", msg:"Грейся какао и передай Габи, что снежинки — это тренировка перед морскими брызгами."},
   21: {src:"img/21.jpg", title:"Сериал и покер", msg:"Ты с сериалом, я с покером, а машем друг другу всё равно. Скоро будем на одном диване."}
@@ -779,7 +782,13 @@ function showCard(idx){
   const msgEl=document.getElementById("msg"), hint=document.getElementById("hint");
   msgEl.textContent=msg;
   document.getElementById("quiz").hidden=true;
-  const showOpen=()=>{document.getElementById("quiz").hidden=true;document.getElementById("art").innerHTML=`<img src="${src}" alt="">`;msgEl.classList.remove("locked");hint.hidden=true;};
+  const showOpen=()=>{document.getElementById("quiz").hidden=true;const artEl=document.getElementById("art");
+    if(pic&&pic.video){
+      artEl.innerHTML=`<video id="vid" src="${pic.video}?v=${PAGE_VER}" poster="${src}" playsinline preload="metadata"></video><button class="playbtn" id="pb" type="button" aria-label="Включить видео">▶</button><div class="playlabel" id="pl">Включи звук 🔊</div>`;
+      const v=document.getElementById("vid"),b=document.getElementById("pb"),l=document.getElementById("pl");
+      const go=()=>{v.controls=true;b.remove();l&&l.remove();v.play().catch(()=>{});};
+      b.onclick=go;
+    } else artEl.innerHTML=`<img src="${src}" alt="">`;msgEl.classList.remove("locked");hint.hidden=true;};
   if(isToday && !arrived && days>0 && !isSolved(idx)){
     msgEl.classList.add("locked");
     const win=()=>{markSolved(idx);celebrate();setTimeout(()=>{if(viewIdx===idx)showOpen()},900);};
