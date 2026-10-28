@@ -120,20 +120,41 @@ export const APP_HTML = HEAD + `
 .gpaw{width:22px;height:22px;color:var(--sunset);flex:none}
 .gcount{font-weight:800;font-size:13px;color:var(--muted);background:var(--surface);border-radius:99px;padding:2px 10px}
 .gcount.full{background:var(--ok-soft);color:var(--ok)}
-.task{background:var(--surface);border-radius:18px;padding:12px 14px;display:grid;grid-template-columns:auto 1fr;gap:6px 12px;align-items:start;box-shadow:0 1px 0 var(--line);border:2px solid transparent;transition:background .3s}
+.task{background:var(--surface);border-radius:16px;display:grid;grid-template-columns:auto 1fr;align-items:center;column-gap:10px;padding:4px 6px 4px 12px;border:2px solid transparent;transition:background .3s}
 .task[data-state=overdue]{border-color:var(--bad-soft)}
-.task[data-state=soon]{border-color:var(--warn-soft)}
-.task.done{background:color-mix(in srgb,var(--ok-soft) 60%,var(--surface))}
+.task.done{background:color-mix(in srgb,var(--ok-soft) 55%,var(--surface))}
 .task.done .ttl{color:var(--muted);text-decoration:line-through;text-decoration-color:color-mix(in srgb,var(--muted) 50%,transparent)}
-.chk{appearance:none;-webkit-appearance:none;width:28px;height:28px;margin:0;border-radius:50%;border:2.5px solid var(--sea);background:var(--surface);cursor:pointer;display:grid;place-content:center;transition:transform .15s}
+.chk{appearance:none;-webkit-appearance:none;width:26px;height:26px;margin:0;border-radius:50%;border:2.5px solid var(--sea);background:var(--surface);cursor:pointer;display:grid;place-content:center;transition:transform .15s}
 .chk:checked{background:var(--ok);border-color:var(--ok)}
-.chk:checked::after{content:"";width:12px;height:7px;border:3px solid #fff;border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
+.chk:checked::after{content:"";width:11px;height:6px;border:3px solid #fff;border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
 .chk:active{transform:scale(.9)}
-.body{min-width:0;display:flex;flex-direction:column;gap:8px}
-.ttl{font-weight:700;overflow-wrap:anywhere;cursor:pointer}
+.rowbtn{font:inherit;color:inherit;text-align:left;background:none;border:0;padding:8px 6px;min-width:0;display:grid;grid-template-columns:1fr auto;align-items:center;gap:4px 10px;cursor:pointer;border-radius:12px}
+.ttl{font-weight:700;font-size:15px;line-height:1.3;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.task.open .ttl{-webkit-line-clamp:unset;display:block}
+.side{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:12px;font-weight:800;white-space:nowrap}
+.cnt{display:inline-flex;align-items:center;gap:3px}
+.cnt svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2}
+.chev{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.5;transition:transform .2s}
+.task.open .chev{transform:rotate(180deg)}
+.details{grid-column:1/-1;display:flex;flex-direction:column;gap:10px;padding:2px 6px 12px 36px}
 .meta{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;font-size:13px;color:var(--muted)}
 .meta input[type=date]{font:inherit;font-size:13px;color:var(--ink);background:var(--bg);border:0;border-radius:10px;padding:4px 8px;max-width:100%}
-.pill{font-size:12px;border-radius:99px;padding:3px 10px;font-weight:800;white-space:nowrap}
+.pill{font-size:12px;border-radius:99px;padding:2px 9px;font-weight:800;white-space:nowrap}
+.pill.plain{background:transparent;color:var(--muted);padding:0}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.st{background:var(--surface);border-radius:18px;padding:10px 12px;display:flex;flex-direction:column;align-items:flex-start}
+.st b{font-family:var(--f-display);font-size:26px;line-height:1.1}
+.st span{font-size:12px;font-weight:800;color:var(--muted)}
+.st.left b{color:var(--sea)}.st.okk b{color:var(--ok)}.st.bad b{color:var(--bad)}.st.bad.zero b{color:var(--muted)}
+.list{display:flex;flex-direction:column;gap:6px}
+.donebox{background:transparent;padding:0;border-radius:0}
+.donebox>summary{font-family:var(--f-body);font-size:13px;font-weight:800;color:var(--ok);padding:6px 4px;list-style:none;display:flex;align-items:center;gap:6px}
+.donebox>summary::-webkit-details-marker{display:none}
+.donebox>summary .chev{width:14px;height:14px}
+.donebox[open]>summary .chev{transform:rotate(180deg)}
+.donebox>.list{margin-top:4px}
+.add input{padding:7px 12px!important;font-size:14px!important}
+.add .btn{padding:7px 12px;font-size:14px}
 .pill.overdue{background:var(--bad-soft);color:var(--bad)}
 .pill.soon{background:var(--warn-soft);color:var(--warn)}
 .pill.okp{background:var(--sea-soft);color:var(--sea)}
@@ -213,6 +234,12 @@ td,th{border-bottom:1px solid var(--line);padding:7px 8px;text-align:left;vertic
     <p class="cheer" id="cheer">Собираем всё, что нужно для полёта.</p>
     <div class="progress"><div class="bar"><i id="progressBar"></i></div><span class="num" id="progressTxt">—</span></div>
   </section>
+
+  <div class="stats" aria-label="Сводка">
+    <div class="st left"><b class="num" id="stLeft">—</b><span>осталось</span></div>
+    <div class="st okk"><b class="num" id="stDone">—</b><span>сделано</span></div>
+    <div class="st bad" id="stBadBox"><b class="num" id="stBad">—</b><span>просрочено</span></div>
+  </div>
 
   <div class="row">
     <div class="next" id="next"><span class="lbl">Следующий шаг</span><span class="t" id="nextT">…</span><span class="sub" id="nextD"></span></div>
@@ -337,6 +364,7 @@ function renderHero(){
   var overdue=t.filter(function(x){return!x.done&&x.due&&days(x.due)<0}).length;
   $("#progressTxt").textContent=t.length?done+" из "+t.length:"—";
   $("#progressBar").style.width=(pct*100)+"%";
+  $("#stLeft").textContent=t.length-done;$("#stDone").textContent=done;$("#stBad").textContent=overdue;$("#stBadBox").classList.toggle("zero",overdue===0);
   $("#cheer").textContent=cheerText(pct,overdue);
   placeMarker(pct);
   var open=t.filter(function(x){return!x.done}).sort(function(a,b){
@@ -362,25 +390,44 @@ function burst(x,y){
 var celT;
 function celebrate(msg){var old=$(".celebrate");if(old)old.remove();clearTimeout(celT);var c=document.createElement("div");c.className="celebrate";c.setAttribute("role","status");c.textContent=msg;document.body.appendChild(c);celT=setTimeout(function(){c.remove()},2700)}
 
+var MS=["янв","фев","мар","апр","мая","июн","июл","авг","сен","окт","ноя","дек"];
+var openSet={},openDone={};
+var CHEV='<svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+var BUBBLE='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>';
+function shortDue(t){
+  if(t.done)return{cls:"donep",txt:"готово"+(t.doneBy&&WHO[t.doneBy]?" · "+WHO[t.doneBy]:"")};
+  if(!t.due)return null;var n=days(t.due),d=parse(t.due);
+  if(n<0)return{cls:"overdue",txt:"просрочено"};
+  if(n===0)return{cls:"soon",txt:"сегодня"};
+  if(n<=3)return{cls:"soon",txt:"через "+dd(n)};
+  return{cls:"plain",txt:"до "+d.getDate()+" "+MS[d.getMonth()]};
+}
 function taskEl(t){
-  var el=document.createElement("article");el.className="task"+(t.done?" done":"");
+  var el=document.createElement("article");el.className="task"+(t.done?" done":"")+(openSet[t.id]?" open":"");
   var st=stateOf(t);if(st)el.dataset.state=st;
-  var cb=document.createElement("input");cb.type="checkbox";cb.className="chk";cb.checked=!!t.done;cb.id="c-"+t.id;cb.setAttribute("aria-label",t.title);
+  var cb=document.createElement("input");cb.type="checkbox";cb.className="chk";cb.checked=!!t.done;cb.id="c-"+t.id;cb.setAttribute("aria-label","Готово: "+t.title);
   cb.addEventListener("change",function(){
     if(cb.checked){var r=cb.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2);celebrate(PRAISE[Math.floor(Math.random()*PRAISE.length)])}
     op({op:"update",id:t.id,patch:{done:cb.checked,doneBy:cb.checked?me:"",doneAt:cb.checked?new Date().toISOString():""}})});
-  var b=document.createElement("div");b.className="body";
-  var ttl=document.createElement("label");ttl.className="ttl";ttl.htmlFor=cb.id;ttl.textContent=t.title;b.appendChild(ttl);
+  var rb=document.createElement("button");rb.type="button";rb.className="rowbtn";rb.setAttribute("aria-expanded",openSet[t.id]?"true":"false");
+  var ttl=document.createElement("span");ttl.className="ttl";ttl.textContent=t.title;rb.appendChild(ttl);
+  var side=document.createElement("span");side.className="side";
+  var sd=shortDue(t);if(sd){var p=document.createElement("span");p.className="pill "+sd.cls;p.textContent=sd.txt;side.appendChild(p)}
+  var nn=(t.notes||[]).length;if(nn){var c=document.createElement("span");c.className="cnt";c.innerHTML=BUBBLE;c.appendChild(document.createTextNode(nn));c.title="Заметок: "+nn;side.appendChild(c)}
+  side.insertAdjacentHTML("beforeend",CHEV);rb.appendChild(side);
+  rb.addEventListener("click",function(){if(openSet[t.id])delete openSet[t.id];else openSet[t.id]=1;render()});
+  el.appendChild(cb);el.appendChild(rb);
+  if(!openSet[t.id])return el;
+  var b=document.createElement("div");b.className="details";
   var meta=document.createElement("div");meta.className="meta";
-  if(t.done){var q=document.createElement("span");q.className="pill donep";q.textContent="готово"+(t.doneBy&&WHO[t.doneBy]?" · "+WHO[t.doneBy]:"");meta.appendChild(q)}
-  else if(t.due){var n=days(t.due);var p=document.createElement("span");p.className="pill "+(n<0?"overdue":n<=3?"soon":"okp");
-    p.textContent=n<0?"просрочено на "+dd(-n):n===0?"сегодня":"осталось "+dd(n);meta.appendChild(p)}
-  var dl=document.createElement("label");dl.textContent="до";dl.htmlFor="d-"+t.id;
+  if(!t.done&&t.due){var n=days(t.due);var q=document.createElement("span");q.className="pill "+(n<0?"overdue":n<=3?"soon":"okp");
+    q.textContent=n<0?"просрочено на "+dd(-n):n===0?"сегодня":"осталось "+dd(n);meta.appendChild(q)}
+  var dl=document.createElement("label");dl.textContent="срок";dl.htmlFor="d-"+t.id;
   var di=document.createElement("input");di.type="date";di.id="d-"+t.id;di.value=t.due||"";
   di.addEventListener("change",function(){op({op:"update",id:t.id,patch:{due:di.value}})});
   var dw=document.createElement("span");dw.style.cssText="display:inline-flex;align-items:center;gap:6px";dw.appendChild(dl);dw.appendChild(di);meta.appendChild(dw);
-  var del=document.createElement("button");del.type="button";del.className="del";del.textContent="Удалить";var armT;
-  del.addEventListener("click",function(){if(del.classList.contains("armed")){clearTimeout(armT);op({op:"delete",id:t.id})}else{del.classList.add("armed");del.textContent="Точно удалить?";armT=setTimeout(function(){del.classList.remove("armed");del.textContent="Удалить"},3500)}});
+  var del=document.createElement("button");del.type="button";del.className="del";del.textContent="Удалить задачу";var armT;
+  del.addEventListener("click",function(){if(del.classList.contains("armed")){clearTimeout(armT);op({op:"delete",id:t.id})}else{del.classList.add("armed");del.textContent="Точно удалить?";armT=setTimeout(function(){del.classList.remove("armed");del.textContent="Удалить задачу"},3500)}});
   meta.appendChild(del);b.appendChild(meta);
   var nl=document.createElement("div");nl.className="notes";
   (t.notes||[]).forEach(function(n){
@@ -395,14 +442,14 @@ function taskEl(t){
     d.appendChild(by);d.appendChild(tx);nl.appendChild(d);
   });
   var nf=document.createElement("form");nf.className="nform";
-  var ta=document.createElement("textarea");ta.className="note";ta.id="n-"+t.id;ta.rows=1;ta.placeholder=me?"Написать заметку от имени "+(me==="dasha"?"Даши":"Жени")+"…":"Написать заметку…";ta.setAttribute("aria-label","Заметка к задаче: "+t.title);
-  try{ta.value=drafts[t.id]||""}catch(e){}
+  var ta=document.createElement("textarea");ta.className="note";ta.id="n-"+t.id;ta.rows=1;ta.placeholder="Написать заметку…";ta.setAttribute("aria-label","Заметка к задаче: "+t.title);
+  ta.value=drafts[t.id]||"";
   ta.addEventListener("input",function(){drafts[t.id]=ta.value;ta.style.height="auto";ta.style.height=ta.scrollHeight+"px"});
   var sb=document.createElement("button");sb.type="submit";sb.textContent="Отправить";
   nf.appendChild(ta);nf.appendChild(sb);
   nf.addEventListener("submit",function(e){e.preventDefault();var v=ta.value.trim();if(!v)return;if(!me){$("#welcome").hidden=false;return}ta.value="";delete drafts[t.id];ta.blur();op({op:"note_add",id:t.id,text:v,by:me})});
-  nl.appendChild(nf);
-  b.appendChild(nl);el.appendChild(cb);el.appendChild(b);return el;
+  nl.appendChild(nf);b.appendChild(nl);el.appendChild(b);
+  return el;
 }
 
 function busyTyping(){var a=document.activeElement;return a&&(a.classList.contains("note")||(a.id||"").indexOf("add-")===0)}
@@ -421,7 +468,13 @@ function render(){
     var h2=document.createElement("h2");h2.textContent=g[1];
     var c=document.createElement("span");c.className="gcount num"+(list.length&&dn===list.length?" full":"");c.textContent=dn+" / "+list.length;
     h.appendChild(pw);h.appendChild(h2);h.appendChild(c);sec.appendChild(h);
-    list.forEach(function(t){sec.appendChild(taskEl(t))});
+    var todo=list.filter(function(t){return!t.done}),fin=list.filter(function(t){return t.done});
+    var ul=document.createElement("div");ul.className="list";todo.forEach(function(t){ul.appendChild(taskEl(t))});sec.appendChild(ul);
+    if(fin.length){var db=document.createElement("details");db.className="donebox";if(openDone[g[0]])db.open=true;
+      var sm=document.createElement("summary");sm.innerHTML=CHEV;sm.insertBefore(document.createTextNode("Сделано · "+fin.length),sm.firstChild);db.appendChild(sm);
+      var dl2=document.createElement("div");dl2.className="list";fin.forEach(function(t){dl2.appendChild(taskEl(t))});db.appendChild(dl2);
+      db.addEventListener("toggle",function(){if(db.open)openDone[g[0]]=1;else delete openDone[g[0]]});
+      sec.appendChild(db)}
     var f=document.createElement("form");f.className="add";
     var i=document.createElement("input");i.id="add-"+g[0];i.placeholder="+ добавить задачу";i.setAttribute("aria-label","Новая задача: "+g[1]);
     var btn=document.createElement("button");btn.className="btn";btn.textContent="Добавить";
