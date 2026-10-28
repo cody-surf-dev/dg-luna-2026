@@ -2,6 +2,7 @@ name = "gabi-plan"
 main = "src/index.js"
 compatibility_date = "2025-09-01"
 workers_dev = true
+preview_urls = false
 
 [[durable_objects.bindings]]
 name = "STORE"
