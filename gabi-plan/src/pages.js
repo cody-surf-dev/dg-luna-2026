@@ -2,6 +2,11 @@
 
 const PAW = '<svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="16" rx="5.2" ry="4.4"/><ellipse cx="5.2" cy="10.2" rx="2.1" ry="2.7"/><ellipse cx="9.4" cy="6.2" rx="2.1" ry="2.8"/><ellipse cx="14.6" cy="6.2" rx="2.1" ry="2.8"/><ellipse cx="18.8" cy="10.2" rx="2.1" ry="2.7"/></svg>';
 
+
+const DASHA = '<svg class="fig dasha" viewBox="0 0 40 56" aria-hidden="true"><path d="M13 7q-6 3-4 15q1 5 4 7l4-15z" fill="#8a5a3c"/><g stroke-linecap="round" fill="none"><path d="M17 31l-5 7-5 2" stroke="#3b3f4a" stroke-width="3.6"/><path d="M17 19l-6 7" stroke="#2f574b" stroke-width="3.4"/></g><path d="M14 16q5-3 9 0l2.5 15h-13.5z" fill="#3f6b5c"/><g stroke-linecap="round" fill="none"><path d="M21 31l5 7-1 8" stroke="#3b3f4a" stroke-width="3.6"/><path d="M22 19l6 5 3-4" stroke="#3f6b5c" stroke-width="3.4"/></g><circle cx="31" cy="20" r="1.8" fill="#f3cfb3"/><path d="M23 46h4" stroke="#5a3d2b" stroke-width="3.4" stroke-linecap="round"/><path d="M5 40l3-2" stroke="#5a3d2b" stroke-width="3.4" stroke-linecap="round"/><circle cx="19" cy="9" r="6.2" fill="#f3cfb3"/><path d="M12.8 9a6.3 6.3 0 0 1 12.5-1.5q-5-.5-8 2.5q-2 3-4.5 3.5z" fill="#8a5a3c"/><circle cx="22.3" cy="9.4" r=".9" fill="#2b2b2b"/><path d="M21.5 12.4q1.4.9 2.7 0" stroke="#b5634a" stroke-width=".9" fill="none" stroke-linecap="round"/></svg>';
+const GABI = '<svg class="fig gabi" viewBox="0 0 32 24" aria-hidden="true"><path d="M5 11q-4-2-2-6q2 3 4 3" fill="#d9a35f"/><g stroke="#c08640" stroke-width="3" stroke-linecap="round"><path d="M10 15l-3 6"/><path d="M13 16l1 6"/><path d="M19 16l-2 6"/><path d="M22 15l4 5"/></g><ellipse cx="15" cy="12" rx="9.5" ry="6.2" fill="#d9a35f"/><circle cx="9" cy="9" r="3" fill="#e2b170"/><circle cx="14" cy="7.5" r="3" fill="#e2b170"/><circle cx="25" cy="8" r="5.6" fill="#e2b170"/><ellipse cx="22.2" cy="9.5" rx="2.6" ry="4.2" fill="#c08640"/><circle cx="26.6" cy="7.3" r=".9" fill="#2b2b2b"/><circle cx="30" cy="9" r="1.2" fill="#2b2b2b"/></svg>';
+const ZHENYA = '<svg class="fig zhenya" viewBox="0 0 48 56" aria-hidden="true"><g stroke="#f0c4a4" stroke-width="3.6" stroke-linecap="round" fill="none"><path d="M17 20l-9-9"/><path d="M31 20l9-9"/></g><circle cx="7" cy="10" r="2.2" fill="#f0c4a4"/><circle cx="41" cy="10" r="2.2" fill="#f0c4a4"/><g stroke="#f0c4a4" stroke-width="3.6" stroke-linecap="round"><path d="M21 41v11"/><path d="M27 41v11"/></g><path d="M19 52h-2M29 52h2" stroke="#5a3d2b" stroke-width="3" stroke-linecap="round"/><rect x="16.5" y="17" width="15" height="17" rx="4" fill="#f4f4f2" stroke="#d6d3cd" stroke-width="1"/><path d="M17 33h14v7q0 2-2 2h-10q-2 0-2-2z" fill="#4aa3a8"/><circle cx="24" cy="9.5" r="6.8" fill="#f0c4a4"/><path d="M17.6 10.5q1 7 6.4 7t6.4-7q-1.5 2.5-6.4 2.5t-6.4-2.5z" fill="#c96a2b"/><circle cx="21.6" cy="8.6" r=".9" fill="#2b2b2b"/><circle cx="26.4" cy="8.6" r=".9" fill="#2b2b2b"/><path d="M22.2 13.2q1.8 1.1 3.6 0" stroke="#7a3a14" stroke-width=".9" fill="none" stroke-linecap="round"/></svg>';
+
 const HEAD = `<!doctype html><html lang="ru"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
@@ -82,10 +87,21 @@ export const APP_HTML = HEAD + `
 .count .unit{font-family:var(--f-display);font-weight:700;font-size:16px}
 .when{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:13px;font-weight:700}
 .when input{font:inherit;font-size:14px;font-weight:600;color:var(--ink);background:color-mix(in srgb,var(--surface) 75%,transparent);border:1px solid var(--line);border-radius:10px;padding:4px 8px}
-.track{position:relative;height:28px;display:flex;align-items:center;gap:8px;font-size:12px;font-weight:800;color:var(--muted)}
-.bar{position:relative;flex:1;height:8px;border-radius:99px;background:color-mix(in srgb,var(--ink) 10%,transparent)}
-.bar>i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--sea),var(--sunset));transition:width .8s}
-.bar .pawm{position:absolute;top:50%;left:0;width:24px;height:24px;margin:-12px 0 0 -12px;border-radius:50%;background:var(--sunset);color:#fff;padding:4px;transition:left .8s;box-shadow:0 0 0 3px var(--surface)}
+.journey{display:flex;flex-direction:column;gap:2px}
+.lane{position:relative;height:62px;margin-right:50px;--p:0}
+.lane .bar{position:absolute;left:0;right:-6px;bottom:6px;height:6px;border-radius:99px;background:color-mix(in srgb,var(--ink) 10%,transparent)}
+.lane .bar>i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--sea),var(--sunset));transition:width .9s}
+.runner{position:absolute;bottom:9px;left:max(0px,calc(var(--p) * 100% - 62px));display:flex;align-items:flex-end;transition:left .9s cubic-bezier(.3,.7,.2,1)}
+.fig{display:block}
+.fig.dasha{width:36px;height:50px;animation:hop .5s ease-in-out infinite alternate}
+.fig.gabi{width:28px;height:21px;margin-left:-2px;animation:hop .32s ease-in-out infinite alternate}
+.papa{position:absolute;right:-52px;bottom:2px;width:48px}
+.fig.zhenya{width:48px;height:56px;transform-origin:50% 100%;animation:wave 1.6s ease-in-out infinite}
+.lane.met .fig{animation:none}
+@keyframes hop{from{transform:translateY(0)}to{transform:translateY(-3px)}}
+@keyframes wave{0%,100%{transform:rotate(0)}50%{transform:rotate(-3deg)}}
+.ends{display:flex;justify-content:space-between;font-size:12px;font-weight:800;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){.fig{animation:none!important}.runner,.lane .bar>i{transition:none}}
 
 /* ---------- me + next ---------- */
 .row{display:flex;gap:12px;flex-wrap:wrap;align-items:stretch}
@@ -206,7 +222,10 @@ td,th{border-bottom:1px solid var(--line);padding:7px 8px;text-align:left;vertic
       <div class="count"><span class="big num" id="cdNum">—</span><span class="unit" id="cdUnit">до встречи</span></div>
       <div class="when"><label for="flightDate">Вылет</label><input type="date" id="flightDate"></div>
     </div>
-    <div class="track" aria-label="Прогресс подготовки"><span>Иркутск</span><div class="bar"><i id="progressBar"></i><span class="pawm paw" id="pawm">${PAW}</span></div><span>Пхукет</span></div>
+    <div class="journey" aria-label="Прогресс подготовки">
+      <div class="lane" id="lane"><div class="bar"><i id="progressBar"></i></div><div class="runner">${DASHA}${GABI}</div><div class="papa">${ZHENYA}</div></div>
+      <div class="ends"><span>Иркутск</span><span>Пхукет</span></div>
+    </div>
   </section>
 
   <div class="stats" aria-label="Сводка">
@@ -308,7 +327,7 @@ function renderTheme(){
 document.querySelectorAll("#theme button").forEach(function(b){b.addEventListener("click",function(){theme=b.dataset.th;try{localStorage.setItem("gp_theme",theme)}catch(e){}renderTheme()})});
 
 var routeLen=0;
-function placeMarker(pct){$("#pawm").style.left=(pct*100)+"%"}
+function placeMarker(pct){var l=$("#lane");l.style.setProperty("--p",pct.toFixed(3));l.classList.toggle("met",pct>=1)}
 function cheerText(pct,overdue){
   var t;
   if(pct>=1)t="Всё готово! Габи летит к Жене.";
