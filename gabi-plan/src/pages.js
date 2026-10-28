@@ -75,29 +75,17 @@ export const NO_PASSWORD_HTML = HEAD + `</head><body><div class="wrap">
 export const APP_HTML = HEAD + `
 <style>
 /* ---------- hero postcard ---------- */
-.hero{position:relative;border-radius:28px;overflow:hidden;background:linear-gradient(165deg,var(--sky-a) 0%,var(--sky-b) 100%);padding:22px 20px 16px;display:flex;flex-direction:column;gap:6px}
-.hero .eyebrow{font-weight:800;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--sea)}
-.count{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
-.count .big{font-family:var(--f-display);font-weight:700;font-size:clamp(56px,17vw,92px);line-height:1;color:var(--sunset)}
-.count .unit{font-family:var(--f-display);font-weight:700;font-size:clamp(18px,4.6vw,24px)}
-.when{display:flex;align-items:center;gap:8px;flex-wrap:wrap;color:var(--muted);font-size:14px}
-.when input{font:inherit;font-size:14px;color:var(--ink);background:color-mix(in srgb,var(--surface) 70%,transparent);border:1px solid var(--line);border-radius:10px;padding:4px 8px}
-.route{width:100%;height:auto;display:block;margin-top:4px}
-.route .base{fill:none;stroke:var(--ink);stroke-opacity:.22;stroke-width:3;stroke-dasharray:2 9;stroke-linecap:round}
-.route .trail{fill:none;stroke:var(--sunset);stroke-width:4;stroke-linecap:round;transition:stroke-dashoffset 1.2s cubic-bezier(.3,.7,.2,1)}
-.route .city{font-family:var(--f-display);font-weight:700;font-size:24px;fill:var(--ink)}
-.route .cityn{font-family:var(--f-body);font-size:12px;fill:var(--muted)}
-.route .dot{fill:var(--surface);stroke:var(--ink);stroke-opacity:.35;stroke-width:2}
-.route .sun{fill:var(--sun)}
-.route .snow{stroke:var(--sea);stroke-width:2;stroke-linecap:round}
-.route .wave{fill:none;stroke:var(--sea);stroke-width:2.2;stroke-linecap:round;opacity:.7}
-#marker{transition:transform 1.2s cubic-bezier(.3,.7,.2,1)}
-#marker circle{fill:var(--sunset)}
-#marker path,#marker ellipse{fill:#fff}
-.cheer{font-weight:700;font-size:16px;margin:2px 0 0}
-.progress{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--muted)}
-.bar{flex:1;height:10px;border-radius:99px;background:color-mix(in srgb,var(--ink) 10%,transparent);overflow:hidden}
+.hero{border-radius:22px;background:linear-gradient(120deg,var(--sky-a) 0%,var(--sky-b) 100%);padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.hrow{display:flex;align-items:center;justify-content:space-between;gap:8px 14px;flex-wrap:wrap}
+.count{display:flex;align-items:baseline;gap:8px;min-width:0}
+.count .big{font-family:var(--f-display);font-weight:700;font-size:40px;line-height:1;color:var(--sunset)}
+.count .unit{font-family:var(--f-display);font-weight:700;font-size:16px}
+.when{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:13px;font-weight:700}
+.when input{font:inherit;font-size:14px;font-weight:600;color:var(--ink);background:color-mix(in srgb,var(--surface) 75%,transparent);border:1px solid var(--line);border-radius:10px;padding:4px 8px}
+.track{position:relative;height:28px;display:flex;align-items:center;gap:8px;font-size:12px;font-weight:800;color:var(--muted)}
+.bar{position:relative;flex:1;height:8px;border-radius:99px;background:color-mix(in srgb,var(--ink) 10%,transparent)}
 .bar>i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--sea),var(--sunset));transition:width .8s}
+.bar .pawm{position:absolute;top:50%;left:0;width:24px;height:24px;margin:-12px 0 0 -12px;border-radius:50%;background:var(--sunset);color:#fff;padding:4px;transition:left .8s;box-shadow:0 0 0 3px var(--surface)}
 
 /* ---------- me + next ---------- */
 .row{display:flex;gap:12px;flex-wrap:wrap;align-items:stretch}
@@ -214,25 +202,11 @@ td,th{border-bottom:1px solid var(--line);padding:7px 8px;text-align:left;vertic
   </div>
 
   <section class="hero" aria-label="До встречи">
-    <span class="eyebrow">Даша и Габи летят к Жене</span>
-    <div class="count"><span class="big num" id="cdNum">—</span><span class="unit" id="cdUnit">до встречи</span></div>
-    <div class="when"><label for="flightDate">Вылет</label><input type="date" id="flightDate"><span id="cdHint"></span></div>
-    <svg class="route" viewBox="0 0 600 172" role="img" aria-label="Маршрут Иркутск — Пхукет">
-      <g class="snow" transform="translate(40 40)"><line x1="-7" y1="0" x2="7" y2="0"/><line x1="-3.5" y1="-6" x2="3.5" y2="6"/><line x1="-3.5" y1="6" x2="3.5" y2="-6"/></g>
-      <circle class="sun" cx="520" cy="26" r="16"/>
-      <path class="wave" d="M498 150 q8 -6 16 0 t16 0 t16 0 t16 0 t16 0"/>
-      <path id="routePath" class="base" d="M40 120 C 150 10, 330 0, 420 70 S 530 140, 560 110"/>
-      <path id="trail" class="trail" d="M40 120 C 150 10, 330 0, 420 70 S 530 140, 560 110"/>
-      <circle class="dot" cx="40" cy="120" r="6"/><circle class="dot" cx="560" cy="110" r="6"/>
-      <text class="city" x="14" y="160">Иркутск</text>
-      <text class="city" x="596" y="82" text-anchor="end">Пхукет</text>
-      <g id="marker" transform="translate(40 120)">
-        <circle r="17"/>
-        <g transform="translate(-9 -10) scale(.75)"><ellipse cx="12" cy="16" rx="5.2" ry="4.4"/><ellipse cx="5.2" cy="10.2" rx="2.1" ry="2.7"/><ellipse cx="9.4" cy="6.2" rx="2.1" ry="2.8"/><ellipse cx="14.6" cy="6.2" rx="2.1" ry="2.8"/><ellipse cx="18.8" cy="10.2" rx="2.1" ry="2.7"/></g>
-      </g>
-    </svg>
-    <p class="cheer" id="cheer">Собираем всё, что нужно для полёта.</p>
-    <div class="progress"><div class="bar"><i id="progressBar"></i></div><span class="num" id="progressTxt">—</span></div>
+    <div class="hrow">
+      <div class="count"><span class="big num" id="cdNum">—</span><span class="unit" id="cdUnit">до встречи</span></div>
+      <div class="when"><label for="flightDate">Вылет</label><input type="date" id="flightDate"></div>
+    </div>
+    <div class="track" aria-label="Прогресс подготовки"><span>Иркутск</span><div class="bar"><i id="progressBar"></i><span class="pawm paw" id="pawm">${PAW}</span></div><span>Пхукет</span></div>
   </section>
 
   <div class="stats" aria-label="Сводка">
@@ -334,13 +308,7 @@ function renderTheme(){
 document.querySelectorAll("#theme button").forEach(function(b){b.addEventListener("click",function(){theme=b.dataset.th;try{localStorage.setItem("gp_theme",theme)}catch(e){}renderTheme()})});
 
 var routeLen=0;
-function placeMarker(pct){
-  var p=$("#routePath"),tr=$("#trail");if(!p.getTotalLength)return;
-  if(!routeLen){routeLen=p.getTotalLength();tr.style.strokeDasharray=routeLen;tr.style.strokeDashoffset=routeLen}
-  var pt=p.getPointAtLength(routeLen*pct);
-  $("#marker").setAttribute("transform","translate("+pt.x.toFixed(1)+" "+pt.y.toFixed(1)+")");
-  tr.style.strokeDashoffset=(routeLen*(1-pct)).toFixed(1);
-}
+function placeMarker(pct){$("#pawm").style.left=(pct*100)+"%"}
 function cheerText(pct,overdue){
   var t;
   if(pct>=1)t="Всё готово! Габи летит к Жене.";
@@ -356,16 +324,14 @@ function renderHero(){
   var fi=$("#flightDate");
   if(document.activeElement!==fi)fi.value=state.plan.flightDate||"";
   var n=days(state.plan.flightDate);
-  if(n===null){$("#cdNum").textContent="скоро";$("#cdUnit").textContent="увидимся";$("#cdHint").textContent="выберите дату, и начнём отсчёт"}
-  else if(n>0){$("#cdNum").textContent=n;$("#cdUnit").textContent=plural(n,"день","дня","дней")+" до встречи";$("#cdHint").textContent=longDate(state.plan.flightDate)}
-  else if(n===0){$("#cdNum").textContent="сегодня";$("#cdUnit").textContent="встречаемся!";$("#cdHint").textContent=""}
-  else{$("#cdNum").textContent="вместе";$("#cdUnit").textContent="";$("#cdHint").textContent=""}
+  if(n===null){$("#cdNum").textContent="скоро";$("#cdUnit").textContent="увидимся — выберите дату вылета";}
+  else if(n>0){$("#cdNum").textContent=n;$("#cdUnit").textContent=plural(n,"день","дня","дней")+" до встречи"}
+  else if(n===0){$("#cdNum").textContent="сегодня";$("#cdUnit").textContent="встречаемся!"}
+  else{$("#cdNum").textContent="вместе";$("#cdUnit").textContent=""}
   var t=state.tasks,done=t.filter(function(x){return x.done}).length,pct=t.length?done/t.length:0;
   var overdue=t.filter(function(x){return!x.done&&x.due&&days(x.due)<0}).length;
-  $("#progressTxt").textContent=t.length?done+" из "+t.length:"—";
   $("#progressBar").style.width=(pct*100)+"%";
   $("#stLeft").textContent=t.length-done;$("#stDone").textContent=done;$("#stBad").textContent=overdue;$("#stBadBox").classList.toggle("zero",overdue===0);
-  $("#cheer").textContent=cheerText(pct,overdue);
   placeMarker(pct);
   var open=t.filter(function(x){return!x.done}).sort(function(a,b){
     if(!!a.due!==!!b.due)return a.due?-1:1;if(a.due!==b.due)return a.due<b.due?-1:1;return(a.order||0)-(b.order||0)});
