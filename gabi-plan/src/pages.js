@@ -1,0 +1,459 @@
+// HTML pages served by the worker. No template literals inside the client script (keeps escaping simple).
+
+const PAW = '<svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="16" rx="5.2" ry="4.4"/><ellipse cx="5.2" cy="10.2" rx="2.1" ry="2.7"/><ellipse cx="9.4" cy="6.2" rx="2.1" ry="2.8"/><ellipse cx="14.6" cy="6.2" rx="2.1" ry="2.8"/><ellipse cx="18.8" cy="10.2" rx="2.1" ry="2.7"/></svg>';
+
+const HEAD = `<!doctype html><html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#fbf4ec" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0e1a24" media="(prefers-color-scheme: dark)">
+<title>Габи → Пхукет</title>
+<script>try{var th=localStorage.getItem("gp_theme");if(th=="light"||th=="dark")document.documentElement.setAttribute("data-theme",th)}catch(e){}</script>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg fill='%23ff7a59'%3E%3Cellipse cx='12' cy='16' rx='5.2' ry='4.4'/%3E%3Cellipse cx='5.2' cy='10.2' rx='2.1' ry='2.7'/%3E%3Cellipse cx='9.4' cy='6.2' rx='2.1' ry='2.8'/%3E%3Cellipse cx='14.6' cy='6.2' rx='2.1' ry='2.8'/%3E%3Cellipse cx='18.8' cy='10.2' rx='2.1' ry='2.7'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@500;700&family=Nunito:wght@400;600;700;800&display=swap">
+<style>
+/* Layout: a postcard-like hero (countdown + route Irkutsk → Phuket with Gabi's paw moving along it), then the journey's task groups, then reference. */
+:root{
+  --bg:#fbf4ec; --surface:#ffffff; --ink:#1d2a33; --muted:#6b7780; --line:#efe2d5;
+  --sea:#14949a; --sea-soft:#dcf1f1; --sunset:#ff7a59; --sunset-soft:#ffe6dc; --sun:#ffc65c;
+  --sky-a:#e3f3f4; --sky-b:#ffe9dc;
+  --bad:#c8352b; --bad-soft:#fde2de; --warn:#b86a12; --warn-soft:#fff0d9; --ok:#2e8a4a; --ok-soft:#e1f4e6;
+  --f-display:"Comfortaa","Nunito",system-ui,sans-serif;
+  --f-body:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme=light]){
+  --bg:#0e1a24; --surface:#16242f; --ink:#eef3f5; --muted:#9aaab3; --line:#24353f;
+  --sea:#4cc6c9; --sea-soft:#163a40; --sunset:#ff8f73; --sunset-soft:#3a2420; --sun:#ffd27a;
+  --sky-a:#132c3a; --sky-b:#2a2032;
+  --bad:#ff8a80; --bad-soft:#3d1d1b; --warn:#f0b05a; --warn-soft:#3a2a17; --ok:#7fd494; --ok-soft:#173222; color-scheme:dark;}}
+:root[data-theme=dark]{
+  --bg:#0e1a24; --surface:#16242f; --ink:#eef3f5; --muted:#9aaab3; --line:#24353f;
+  --sea:#4cc6c9; --sea-soft:#163a40; --sunset:#ff8f73; --sunset-soft:#3a2420; --sun:#ffd27a;
+  --sky-a:#132c3a; --sky-b:#2a2032;
+  --bad:#ff8a80; --bad-soft:#3d1d1b; --warn:#f0b05a; --warn-soft:#3a2a17; --ok:#7fd494; --ok-soft:#173222; color-scheme:dark;}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.45}
+.wrap{max-width:760px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:18px 56px;display:flex;flex-direction:column;gap:24px}
+h1,h2,.display{font-family:var(--f-display);font-weight:700;margin:0;text-wrap:balance;letter-spacing:-.01em}
+h2{font-size:18px}
+.sub{color:var(--muted);margin:0}
+.num{font-variant-numeric:tabular-nums}
+.btn{font:inherit;font-size:15px;font-weight:700;border:0;border-radius:14px;padding:10px 16px;background:var(--sea);color:var(--surface);cursor:pointer}
+input:focus-visible,button:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid var(--sunset);outline-offset:2px}
+a{color:var(--sea)}
+.paw svg{width:100%;height:100%;fill:currentColor;display:block}
+</style>`;
+
+export const LOGIN_HTML = HEAD + `
+<style>
+body{background:linear-gradient(180deg,var(--sky-a),var(--sky-b) 70%,var(--bg));min-height:100vh}
+.login{max-width:380px;margin:0 auto;padding-top:14vh;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+.login .paw{width:44px;height:44px;color:var(--sunset)}
+.login h1{font-size:30px}
+.login input{font:inherit;font-size:17px;color:var(--ink);background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:12px 14px;width:100%}
+.err{color:var(--bad);margin:0;font-weight:700}
+</style></head><body>
+<form class="login" method="post" action="/login">
+  <span class="paw">${PAW}</span>
+  <h1>Габи летит к Жене</h1>
+  <p class="sub">Наш общий план переезда Габи на Пхукет.</p>
+  <!--ERR-->
+  <label for="pw" class="sub">Пароль</label>
+  <input id="pw" name="password" type="password" autocomplete="current-password" required autofocus>
+  <button class="btn" type="submit">Войти</button>
+</form></body></html>`;
+
+export const NO_PASSWORD_HTML = HEAD + `</head><body><div class="wrap">
+<h1>Габи → Пхукет</h1>
+<p>Сайт почти готов: в настройках воркера в Cloudflare нужно добавить секрет <b>PASSWORD</b> (Settings → Variables and Secrets) и нажать Deploy.</p>
+</div></body></html>`;
+
+export const APP_HTML = HEAD + `
+<style>
+/* ---------- hero postcard ---------- */
+.hero{position:relative;border-radius:28px;overflow:hidden;background:linear-gradient(165deg,var(--sky-a) 0%,var(--sky-b) 100%);padding:22px 20px 16px;display:flex;flex-direction:column;gap:6px}
+.hero .eyebrow{font-weight:800;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--sea)}
+.count{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.count .big{font-family:var(--f-display);font-weight:700;font-size:clamp(56px,17vw,92px);line-height:1;color:var(--sunset)}
+.count .unit{font-family:var(--f-display);font-weight:700;font-size:clamp(18px,4.6vw,24px)}
+.when{display:flex;align-items:center;gap:8px;flex-wrap:wrap;color:var(--muted);font-size:14px}
+.when input{font:inherit;font-size:14px;color:var(--ink);background:color-mix(in srgb,var(--surface) 70%,transparent);border:1px solid var(--line);border-radius:10px;padding:4px 8px}
+.route{width:100%;height:auto;display:block;margin-top:4px}
+.route .base{fill:none;stroke:var(--ink);stroke-opacity:.22;stroke-width:3;stroke-dasharray:2 9;stroke-linecap:round}
+.route .trail{fill:none;stroke:var(--sunset);stroke-width:4;stroke-linecap:round;transition:stroke-dashoffset 1.2s cubic-bezier(.3,.7,.2,1)}
+.route .city{font-family:var(--f-display);font-weight:700;font-size:24px;fill:var(--ink)}
+.route .cityn{font-family:var(--f-body);font-size:12px;fill:var(--muted)}
+.route .dot{fill:var(--surface);stroke:var(--ink);stroke-opacity:.35;stroke-width:2}
+.route .sun{fill:var(--sun)}
+.route .snow{stroke:var(--sea);stroke-width:2;stroke-linecap:round}
+.route .wave{fill:none;stroke:var(--sea);stroke-width:2.2;stroke-linecap:round;opacity:.7}
+#marker{transition:transform 1.2s cubic-bezier(.3,.7,.2,1)}
+#marker circle{fill:var(--sunset)}
+#marker path,#marker ellipse{fill:#fff}
+.cheer{font-weight:700;font-size:16px;margin:2px 0 0}
+.progress{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--muted)}
+.bar{flex:1;height:10px;border-radius:99px;background:color-mix(in srgb,var(--ink) 10%,transparent);overflow:hidden}
+.bar>i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--sea),var(--sunset));transition:width .8s}
+
+/* ---------- me + next ---------- */
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:stretch}
+.next{flex:1 1 300px;min-width:0;background:var(--surface);border-radius:20px;padding:14px 16px;display:flex;flex-direction:column;gap:4px;border:2px solid var(--sea-soft)}
+.next .lbl{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--sea)}
+.next .t{font-weight:700}
+.mebox{background:var(--surface);border-radius:20px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.mebox .lbl{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.seg{display:inline-flex;background:var(--bg);border-radius:99px;padding:3px;gap:2px}
+.seg button{font:inherit;font-size:14px;font-weight:700;border:0;background:transparent;color:var(--muted);padding:5px 12px;border-radius:99px;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--sea);color:var(--surface)}
+.seg.small button{font-size:12px;padding:3px 9px}
+
+.notice{border-radius:16px;padding:12px 14px;background:var(--warn-soft);font-size:14px}
+
+/* ---------- tasks ---------- */
+.group{display:flex;flex-direction:column;gap:10px}
+.ghead{display:flex;align-items:center;gap:10px}
+.ghead h2{flex:1;min-width:0}
+.gpaw{width:22px;height:22px;color:var(--sunset);flex:none}
+.gcount{font-weight:800;font-size:13px;color:var(--muted);background:var(--surface);border-radius:99px;padding:2px 10px}
+.gcount.full{background:var(--ok-soft);color:var(--ok)}
+.task{background:var(--surface);border-radius:18px;padding:12px 14px;display:grid;grid-template-columns:auto 1fr;gap:6px 12px;align-items:start;box-shadow:0 1px 0 var(--line);border:2px solid transparent;transition:background .3s}
+.task[data-state=overdue]{border-color:var(--bad-soft)}
+.task[data-state=soon]{border-color:var(--warn-soft)}
+.task.done{background:color-mix(in srgb,var(--ok-soft) 60%,var(--surface))}
+.task.done .ttl{color:var(--muted);text-decoration:line-through;text-decoration-color:color-mix(in srgb,var(--muted) 50%,transparent)}
+.chk{appearance:none;-webkit-appearance:none;width:28px;height:28px;margin:0;border-radius:50%;border:2.5px solid var(--sea);background:var(--surface);cursor:pointer;display:grid;place-content:center;transition:transform .15s}
+.chk:checked{background:var(--ok);border-color:var(--ok)}
+.chk:checked::after{content:"";width:12px;height:7px;border:3px solid #fff;border-top:0;border-right:0;transform:rotate(-45deg) translate(1px,-1px)}
+.chk:active{transform:scale(.9)}
+.body{min-width:0;display:flex;flex-direction:column;gap:8px}
+.ttl{font-weight:700;overflow-wrap:anywhere;cursor:pointer}
+.meta{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;font-size:13px;color:var(--muted)}
+.meta input[type=date]{font:inherit;font-size:13px;color:var(--ink);background:var(--bg);border:0;border-radius:10px;padding:4px 8px;max-width:100%}
+.pill{font-size:12px;border-radius:99px;padding:3px 10px;font-weight:800;white-space:nowrap}
+.pill.overdue{background:var(--bad-soft);color:var(--bad)}
+.pill.soon{background:var(--warn-soft);color:var(--warn)}
+.pill.okp{background:var(--sea-soft);color:var(--sea)}
+.pill.donep{background:var(--ok-soft);color:var(--ok)}
+.notes{display:flex;flex-direction:column;gap:6px}
+.nt{background:var(--bg);border-radius:12px;padding:8px 10px;font-size:14px;display:flex;flex-direction:column;gap:2px}
+.nt.mine{background:color-mix(in srgb,var(--sea-soft) 70%,var(--bg))}
+.nt .by{font-size:12px;font-weight:800;color:var(--muted);display:flex;gap:8px;align-items:baseline}
+.nt .by b{color:var(--sea)}
+.nt .by .x{margin-left:auto;font:inherit;font-size:12px;border:0;background:none;color:var(--muted);cursor:pointer;padding:0}
+.nt .by .x.armed{color:var(--bad)}
+.nt .tx{white-space:pre-wrap;overflow-wrap:anywhere}
+.nform{display:flex;gap:6px;align-items:flex-end}
+.nform textarea{flex:1;min-width:0;font:inherit;font-size:14px;color:var(--ink);background:transparent;border:2px dashed var(--line);border-radius:12px;padding:6px 10px;resize:none;min-height:36px;max-height:160px}
+.nform button{font:inherit;font-size:13px;font-weight:800;border:0;border-radius:12px;padding:8px 12px;background:var(--sea-soft);color:var(--sea);cursor:pointer}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.hello{font-weight:700;color:var(--muted);font-size:14px}
+.hello button{font:inherit;font-weight:800;color:var(--sea);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.welcome{position:fixed;inset:0;z-index:70;background:color-mix(in srgb,var(--ink) 45%,transparent);display:grid;place-items:center;padding:max(16px,env(safe-area-inset-left,0px))}
+.welcome .card{background:var(--surface);border-radius:26px;padding:26px 22px;max-width:360px;width:100%;display:flex;flex-direction:column;gap:14px;text-align:center}
+.welcome .paw{width:40px;height:40px;color:var(--sunset);margin:0 auto}
+.welcome .pick{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.welcome .pick button{font:inherit;font-family:var(--f-display);font-weight:700;font-size:18px;border:0;border-radius:18px;padding:16px 8px;cursor:pointer;background:var(--sea-soft);color:var(--sea)}
+.welcome .pick button:last-child{background:var(--sunset-soft);color:var(--sunset)}
+.del{font:inherit;font-size:12px;border:0;background:none;color:var(--muted);cursor:pointer;padding:2px 4px;margin-left:auto}
+.del.armed{color:var(--bad);font-weight:800}
+.add{display:flex;gap:8px}
+.add input{flex:1;min-width:0;font:inherit;font-size:15px;color:var(--ink);background:transparent;border:2px dashed var(--line);border-radius:14px;padding:9px 12px}
+.empty{color:var(--muted);font-size:15px;padding:16px;border:2px dashed var(--line);border-radius:18px}
+
+/* ---------- reference ---------- */
+details{background:var(--surface);border-radius:18px;padding:14px 16px}
+summary{font-family:var(--f-display);font-weight:700;font-size:15px;cursor:pointer}
+details ul,details ol{padding-left:20px;margin:10px 0 0;display:flex;flex-direction:column;gap:6px}
+.copyrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.mail{font-weight:700;overflow-wrap:anywhere}
+.copy{font:inherit;font-size:12px;font-weight:700;border:0;background:var(--sea-soft);color:var(--sea);border-radius:99px;padding:3px 10px;cursor:pointer}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;font-size:14px;width:100%}
+td,th{border-bottom:1px solid var(--line);padding:7px 8px;text-align:left;vertical-align:top}
+.foot{font-size:13px;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+
+/* ---------- paw confetti ---------- */
+.burst{position:fixed;width:18px;height:18px;pointer-events:none;z-index:50;animation:fly .9s ease-out forwards}
+@keyframes fly{0%{opacity:1;transform:translate(0,0) scale(.6) rotate(0)}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.1) rotate(var(--r))}}
+.celebrate{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);font-weight:700;border-radius:99px;padding:10px 18px;z-index:60;max-width:calc(100% - 32px);text-align:center;animation:pop 2.6s ease forwards}
+@keyframes pop{0%{opacity:0;transform:translate(-50%,12px)}12%,80%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,8px)}}
+@media (prefers-reduced-motion:reduce){.burst{display:none}#marker,.route .trail,.bar>i{transition:none}.celebrate{animation:none}}
+</style></head><body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span class="hello" id="hello"></span>
+    <span class="seg small" id="theme" role="group" aria-label="Тема оформления">
+      <button type="button" data-th="auto">Авто</button><button type="button" data-th="light">Светлая</button><button type="button" data-th="dark">Тёмная</button>
+    </span>
+  </div>
+
+  <section class="hero" aria-label="До встречи">
+    <span class="eyebrow">Даша и Габи летят к Жене</span>
+    <div class="count"><span class="big num" id="cdNum">—</span><span class="unit" id="cdUnit">до встречи</span></div>
+    <div class="when"><label for="flightDate">Вылет</label><input type="date" id="flightDate"><span id="cdHint"></span></div>
+    <svg class="route" viewBox="0 0 600 172" role="img" aria-label="Маршрут Иркутск — Пхукет">
+      <g class="snow" transform="translate(40 40)"><line x1="-7" y1="0" x2="7" y2="0"/><line x1="-3.5" y1="-6" x2="3.5" y2="6"/><line x1="-3.5" y1="6" x2="3.5" y2="-6"/></g>
+      <circle class="sun" cx="520" cy="26" r="16"/>
+      <path class="wave" d="M498 150 q8 -6 16 0 t16 0 t16 0 t16 0 t16 0"/>
+      <path id="routePath" class="base" d="M40 120 C 150 10, 330 0, 420 70 S 530 140, 560 110"/>
+      <path id="trail" class="trail" d="M40 120 C 150 10, 330 0, 420 70 S 530 140, 560 110"/>
+      <circle class="dot" cx="40" cy="120" r="6"/><circle class="dot" cx="560" cy="110" r="6"/>
+      <text class="city" x="14" y="160">Иркутск</text>
+      <text class="city" x="596" y="82" text-anchor="end">Пхукет</text>
+      <g id="marker" transform="translate(40 120)">
+        <circle r="17"/>
+        <g transform="translate(-9 -10) scale(.75)"><ellipse cx="12" cy="16" rx="5.2" ry="4.4"/><ellipse cx="5.2" cy="10.2" rx="2.1" ry="2.7"/><ellipse cx="9.4" cy="6.2" rx="2.1" ry="2.8"/><ellipse cx="14.6" cy="6.2" rx="2.1" ry="2.8"/><ellipse cx="18.8" cy="10.2" rx="2.1" ry="2.7"/></g>
+      </g>
+    </svg>
+    <p class="cheer" id="cheer">Собираем всё, что нужно для полёта.</p>
+    <div class="progress"><div class="bar"><i id="progressBar"></i></div><span class="num" id="progressTxt">—</span></div>
+  </section>
+
+  <div class="row">
+    <div class="next" id="next"><span class="lbl">Следующий шаг</span><span class="t" id="nextT">…</span><span class="sub" id="nextD"></span></div>
+  </div>
+
+  <div id="status" class="notice" hidden></div>
+  <div id="groups" style="display:flex;flex-direction:column;gap:26px">
+    <div class="empty">Загружаю список задач…</div>
+  </div>
+
+  <section style="display:flex;flex-direction:column;gap:10px" aria-label="Справка">
+    <h2>Шпаргалка</h2>
+    <details>
+      <summary>Что нужно Габи для Таиланда</summary>
+      <div class="tbl"><table>
+        <tr><th>Что</th><th>Требование</th></tr>
+        <tr><td>Чип</td><td>ISO 11784/11785, 15 цифр, номер в ветпаспорте. Прививка от бешенства — после чипирования</td></tr>
+        <tr><td>Бешенство</td><td>Не позже чем за 21 день до вылета и не старше 1 года</td></tr>
+        <tr><td>Чума, гепатит, парвовирус</td><td>Не позже чем за 21 день до вылета</td></tr>
+        <tr><td>Лептоспироз</td><td>За 21+ день до вылета или отрицательный тест за 30 дней</td></tr>
+        <tr><td>Паразиты</td><td>Обработка от блох, клещей и глистов перед вылетом</td></tr>
+        <tr><td>Переноска</td><td>Закрытая, без выхода носа и лап</td></tr>
+      </table></div>
+    </details>
+    <details>
+      <summary>Куда отправлять заявку</summary>
+      <ul>
+        <li>В карантинную службу <b>первого аэропорта Таиланда</b> на маршруте. Тема письма: <b>Request an Import Permit</b>.</li>
+        <li><div class="copyrow">Прямой рейс в Пхукет: <span class="mail" id="e1">qshk_hkt@dld.go.th</span><button class="copy" data-copy="e1">Копировать</button></div>Тел. <span class="num">+66 76 351 514</span></li>
+        <li><div class="copyrow">Через Бангкок: <span class="mail" id="e2">qsap_bkk_import@dld.go.th</span><button class="copy" data-copy="e2">Копировать</button></div>Тел. <span class="num">+66 2 134 0636</span></li>
+        <li>Приложить: форму R1/1, скан паспорта Даши, цветное фото Габи, ветпаспорт (чип и прививки), бронь рейса, адрес в Таиланде.</li>
+        <li>Ответ через 3–7 рабочих дней, разрешение действует 60 дней. Для Пхукета одна инструкция просит подавать не позднее чем за 14 дней до прилёта.</li>
+      </ul>
+    </details>
+    <details>
+      <summary>Россия: форма №1 и сертификат 5а</summary>
+      <ol>
+        <li>Форма №1 — в госветклинике (СББЖ) за 3–5 дней до вылета, с ветпаспортом, после обработки от паразитов.</li>
+        <li>В день вылета — обмен на сертификат 5а на ветконтроле Россельхознадзора в аэропорту, откуда самолёт уходит за границу.</li>
+        <li>С собой в самолёт: распечатка разрешения, оригинал 5а, ветпаспорт, копия паспорта Даши.</li>
+      </ol>
+    </details>
+    <details>
+      <summary>Источники</summary>
+      <ul>
+        <li><a href="https://image.mfa.go.th/mfa/0/91fPdh6NtO/About-Thailand/Bringing_Pets_to_Thailand/All_Airports_-_Instructions_for_Bringing_Dog-Cat-Rabbit_into_Thailand_from_the_USA_(Revised_30Jan2025).pdf" target="_blank" rel="noopener">Инструкция МИД Таиланда: все аэропорты и email</a></li>
+        <li><a href="https://www.opsmoac.go.th/moscow-dwl-files-421991791251" target="_blank" rel="noopener">Требования DLD к ввозу собак и кошек</a></li>
+        <li><a href="https://www.opsmoac.go.th/dc-news-files-431591791833" target="_blank" rel="noopener">Документы для Пхукета (срок 14 дней)</a></li>
+        <li><a href="https://phuket.airportthai.co.th/service/airport-guide/detail/AnimalQuarantineStation_HKT" target="_blank" rel="noopener">Карантинная станция аэропорта Пхукета</a></li>
+      </ul>
+    </details>
+  </section>
+  <div class="welcome" id="welcome" hidden>
+    <div class="card" role="dialog" aria-modal="true" aria-labelledby="wq">
+      <span class="paw">${PAW}</span>
+      <h2 id="wq">Кто зашёл?</h2>
+      <p class="sub">Ваши галочки и заметки будут подписаны вашим именем. Выбор запомнится на этом устройстве.</p>
+      <div class="pick"><button type="button" data-pick="dasha">Даша</button><button type="button" data-pick="evgen">Женя</button></div>
+    </div>
+  </div>
+  <div class="foot"><span id="sync">Синхронизация…</span><a href="/logout">Выйти</a></div>
+</div>
+
+<script>
+var PAW='${PAW}';
+var GROUPS=[["vet","Ветпаспорт и прививки"],["permit","Разрешение Таиланда"],["flight","Перелёт"],["russia","Перед вылетом из России"],["bag","Папка с собой в самолёт"]];
+var WHO={dasha:"Даша",evgen:"Женя"};
+var MON=["января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"];
+var state={rev:0,tasks:[],plan:{}},me="",lastDone=-1,drafts={};
+try{me=localStorage.getItem("gp_me")||""}catch(e){}
+var reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+function $(s){return document.querySelector(s)}
+function today(){var d=new Date();d.setHours(0,0,0,0);return d}
+function parse(s){if(!s)return null;var p=s.split("-").map(Number);return new Date(p[0],p[1]-1,p[2])}
+function days(s){var d=parse(s);return d?Math.round((d-today())/864e5):null}
+function plural(n,a,b,c){n=Math.abs(n)%100;var k=n%10;if(n>10&&n<20)return c;if(k>1&&k<5)return b;if(k==1)return a;return c}
+function dd(n){return n+" "+plural(n,"день","дня","дней")}
+function when(iso){if(!iso)return"";var d=new Date(iso);if(isNaN(d))return"";var t=today(),dd0=new Date(d);dd0.setHours(0,0,0,0);var diff=Math.round((t-dd0)/864e5);var hm=String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");return diff===0?"сегодня "+hm:diff===1?"вчера "+hm:d.getDate()+" "+MON[d.getMonth()]+" "+hm}
+function longDate(s){var d=parse(s);return d?d.getDate()+" "+MON[d.getMonth()]:""}
+function showStatus(msg){var el=$("#status");el.textContent=msg||"";el.hidden=!msg}
+
+function renderMe(){
+  var h=$("#hello");h.innerHTML="";
+  if(me){h.appendChild(document.createTextNode("Привет, "+WHO[me]+"! "));var c=document.createElement("button");c.type="button";c.textContent="Это не я";c.addEventListener("click",function(){$("#welcome").hidden=false});h.appendChild(c)}
+  $("#welcome").hidden=!!me;
+}
+document.querySelectorAll("[data-pick]").forEach(function(b){b.addEventListener("click",function(){me=b.dataset.pick;try{localStorage.setItem("gp_me",me)}catch(e){}renderMe();render()})});
+var theme="auto";try{theme=localStorage.getItem("gp_theme")||"auto"}catch(e){}
+function renderTheme(){
+  if(theme==="auto")document.documentElement.removeAttribute("data-theme");else document.documentElement.setAttribute("data-theme",theme);
+  document.querySelectorAll("#theme button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.th===theme?"true":"false")});
+}
+document.querySelectorAll("#theme button").forEach(function(b){b.addEventListener("click",function(){theme=b.dataset.th;try{localStorage.setItem("gp_theme",theme)}catch(e){}renderTheme()})});
+
+var routeLen=0;
+function placeMarker(pct){
+  var p=$("#routePath"),tr=$("#trail");if(!p.getTotalLength)return;
+  if(!routeLen){routeLen=p.getTotalLength();tr.style.strokeDasharray=routeLen;tr.style.strokeDashoffset=routeLen}
+  var pt=p.getPointAtLength(routeLen*pct);
+  $("#marker").setAttribute("transform","translate("+pt.x.toFixed(1)+" "+pt.y.toFixed(1)+")");
+  tr.style.strokeDashoffset=(routeLen*(1-pct)).toFixed(1);
+}
+function cheerText(pct,overdue){
+  var t;
+  if(pct>=1)t="Всё готово! Габи летит к Жене.";
+  else if(pct>=.75)t="Финишная прямая. Ещё чуть-чуть, и вы вместе.";
+  else if(pct>=.5)t="Больше половины позади. Габи уже пакует любимую игрушку.";
+  else if(pct>=.25)t="Четверть пути пройдена. Отличный темп!";
+  else if(pct>0)t="Первые шаги сделаны. Каждая галочка приближает встречу.";
+  else t="Начинаем путь. Каждая галочка приближает встречу.";
+  if(overdue>0)t+=" "+(overdue===1?"Одна задача просрочена":"Просроченных задач: "+overdue)+" — они отмечены красным.";
+  return t;
+}
+function renderHero(){
+  var fi=$("#flightDate");
+  if(document.activeElement!==fi)fi.value=state.plan.flightDate||"";
+  var n=days(state.plan.flightDate);
+  if(n===null){$("#cdNum").textContent="скоро";$("#cdUnit").textContent="увидимся";$("#cdHint").textContent="выберите дату, и начнём отсчёт"}
+  else if(n>0){$("#cdNum").textContent=n;$("#cdUnit").textContent=plural(n,"день","дня","дней")+" до встречи";$("#cdHint").textContent=longDate(state.plan.flightDate)}
+  else if(n===0){$("#cdNum").textContent="сегодня";$("#cdUnit").textContent="встречаемся!";$("#cdHint").textContent=""}
+  else{$("#cdNum").textContent="вместе";$("#cdUnit").textContent="";$("#cdHint").textContent=""}
+  var t=state.tasks,done=t.filter(function(x){return x.done}).length,pct=t.length?done/t.length:0;
+  var overdue=t.filter(function(x){return!x.done&&x.due&&days(x.due)<0}).length;
+  $("#progressTxt").textContent=t.length?done+" из "+t.length:"—";
+  $("#progressBar").style.width=(pct*100)+"%";
+  $("#cheer").textContent=cheerText(pct,overdue);
+  placeMarker(pct);
+  var open=t.filter(function(x){return!x.done}).sort(function(a,b){
+    if(!!a.due!==!!b.due)return a.due?-1:1;if(a.due!==b.due)return a.due<b.due?-1:1;return(a.order||0)-(b.order||0)});
+  var nx=open[0];
+  if(!nx){$("#nextT").textContent="Всё сделано. Ура!";$("#nextD").textContent=""}
+  else{$("#nextT").textContent=nx.title;var d=days(nx.due);
+    $("#nextD").textContent=nx.due?(d<0?"просрочено на "+dd(-d):d===0?"сегодня":"до "+longDate(nx.due)+", осталось "+dd(d)):"без срока"}
+  if(lastDone>=0&&t.length&&done===t.length&&lastDone<t.length)celebrate("Все задачи выполнены! Габи готова к полёту.");
+  lastDone=done;
+}
+function stateOf(t){if(t.done||!t.due)return"";var n=days(t.due);if(n<0)return"overdue";if(n<=3)return"soon";return""}
+
+var PRAISE=["Ещё на шаг ближе!","Отлично!","Габи одобряет!","Так держать!","Минус одна задача!","Супер, едем дальше!"];
+function burst(x,y){
+  if(reduce)return;
+  for(var i=0;i<9;i++){var s=document.createElement("span");s.className="burst paw";s.innerHTML=PAW;
+    var a=Math.random()*Math.PI*2,r=50+Math.random()*60;
+    s.style.left=(x-9)+"px";s.style.top=(y-9)+"px";s.style.color=["var(--sunset)","var(--sea)","var(--sun)"][i%3];
+    s.style.setProperty("--dx",(Math.cos(a)*r).toFixed(0)+"px");s.style.setProperty("--dy",(Math.sin(a)*r-30).toFixed(0)+"px");s.style.setProperty("--r",(Math.random()*120-60).toFixed(0)+"deg");
+    document.body.appendChild(s);setTimeout(function(el){return function(){el.remove()}}(s),1000)}
+}
+var celT;
+function celebrate(msg){var old=$(".celebrate");if(old)old.remove();clearTimeout(celT);var c=document.createElement("div");c.className="celebrate";c.setAttribute("role","status");c.textContent=msg;document.body.appendChild(c);celT=setTimeout(function(){c.remove()},2700)}
+
+function taskEl(t){
+  var el=document.createElement("article");el.className="task"+(t.done?" done":"");
+  var st=stateOf(t);if(st)el.dataset.state=st;
+  var cb=document.createElement("input");cb.type="checkbox";cb.className="chk";cb.checked=!!t.done;cb.id="c-"+t.id;cb.setAttribute("aria-label",t.title);
+  cb.addEventListener("change",function(){
+    if(cb.checked){var r=cb.getBoundingClientRect();burst(r.left+r.width/2,r.top+r.height/2);celebrate(PRAISE[Math.floor(Math.random()*PRAISE.length)])}
+    op({op:"update",id:t.id,patch:{done:cb.checked,doneBy:cb.checked?me:"",doneAt:cb.checked?new Date().toISOString():""}})});
+  var b=document.createElement("div");b.className="body";
+  var ttl=document.createElement("label");ttl.className="ttl";ttl.htmlFor=cb.id;ttl.textContent=t.title;b.appendChild(ttl);
+  var meta=document.createElement("div");meta.className="meta";
+  if(t.done){var q=document.createElement("span");q.className="pill donep";q.textContent="готово"+(t.doneBy&&WHO[t.doneBy]?" · "+WHO[t.doneBy]:"");meta.appendChild(q)}
+  else if(t.due){var n=days(t.due);var p=document.createElement("span");p.className="pill "+(n<0?"overdue":n<=3?"soon":"okp");
+    p.textContent=n<0?"просрочено на "+dd(-n):n===0?"сегодня":"осталось "+dd(n);meta.appendChild(p)}
+  var dl=document.createElement("label");dl.textContent="до";dl.htmlFor="d-"+t.id;
+  var di=document.createElement("input");di.type="date";di.id="d-"+t.id;di.value=t.due||"";
+  di.addEventListener("change",function(){op({op:"update",id:t.id,patch:{due:di.value}})});
+  var dw=document.createElement("span");dw.style.cssText="display:inline-flex;align-items:center;gap:6px";dw.appendChild(dl);dw.appendChild(di);meta.appendChild(dw);
+  var del=document.createElement("button");del.type="button";del.className="del";del.textContent="Удалить";var armT;
+  del.addEventListener("click",function(){if(del.classList.contains("armed")){clearTimeout(armT);op({op:"delete",id:t.id})}else{del.classList.add("armed");del.textContent="Точно удалить?";armT=setTimeout(function(){del.classList.remove("armed");del.textContent="Удалить"},3500)}});
+  meta.appendChild(del);b.appendChild(meta);
+  var nl=document.createElement("div");nl.className="notes";
+  (t.notes||[]).forEach(function(n){
+    var d=document.createElement("div");d.className="nt"+(n.by&&n.by===me?" mine":"");
+    var by=document.createElement("div");by.className="by";
+    var who2=document.createElement("b");who2.textContent=n.by&&WHO[n.by]?WHO[n.by]:"План";by.appendChild(who2);
+    var tm=document.createElement("span");tm.textContent=when(n.at);by.appendChild(tm);
+    var x=document.createElement("button");x.type="button";x.className="x";x.textContent="удалить";var xt;
+    x.addEventListener("click",function(){if(x.classList.contains("armed")){clearTimeout(xt);op({op:"note_del",id:t.id,noteId:n.id})}else{x.classList.add("armed");x.textContent="точно?";xt=setTimeout(function(){x.classList.remove("armed");x.textContent="удалить"},3000)}});
+    by.appendChild(x);
+    var tx=document.createElement("div");tx.className="tx";tx.textContent=n.text;
+    d.appendChild(by);d.appendChild(tx);nl.appendChild(d);
+  });
+  var nf=document.createElement("form");nf.className="nform";
+  var ta=document.createElement("textarea");ta.className="note";ta.id="n-"+t.id;ta.rows=1;ta.placeholder=me?"Написать заметку от имени "+(me==="dasha"?"Даши":"Жени")+"…":"Написать заметку…";ta.setAttribute("aria-label","Заметка к задаче: "+t.title);
+  try{ta.value=drafts[t.id]||""}catch(e){}
+  ta.addEventListener("input",function(){drafts[t.id]=ta.value;ta.style.height="auto";ta.style.height=ta.scrollHeight+"px"});
+  var sb=document.createElement("button");sb.type="submit";sb.textContent="Отправить";
+  nf.appendChild(ta);nf.appendChild(sb);
+  nf.addEventListener("submit",function(e){e.preventDefault();var v=ta.value.trim();if(!v)return;if(!me){$("#welcome").hidden=false;return}ta.value="";delete drafts[t.id];ta.blur();op({op:"note_add",id:t.id,text:v,by:me})});
+  nl.appendChild(nf);
+  b.appendChild(nl);el.appendChild(cb);el.appendChild(b);return el;
+}
+
+function busyTyping(){var a=document.activeElement;return a&&(a.classList.contains("note")||(a.id||"").indexOf("add-")===0)}
+var pendingRender=false;
+function render(){
+  renderHero();
+  if(busyTyping()){pendingRender=true;return}
+  pendingRender=false;
+  var root=$("#groups");root.innerHTML="";
+  GROUPS.forEach(function(g){
+    var list=state.tasks.filter(function(t){return(t.group||"vet")===g[0]}).sort(function(a,b){return(a.order||0)-(b.order||0)});
+    var dn=list.filter(function(t){return t.done}).length;
+    var sec=document.createElement("section");sec.className="group";
+    var h=document.createElement("div");h.className="ghead";
+    var pw=document.createElement("span");pw.className="gpaw paw";pw.innerHTML=PAW;
+    var h2=document.createElement("h2");h2.textContent=g[1];
+    var c=document.createElement("span");c.className="gcount num"+(list.length&&dn===list.length?" full":"");c.textContent=dn+" / "+list.length;
+    h.appendChild(pw);h.appendChild(h2);h.appendChild(c);sec.appendChild(h);
+    list.forEach(function(t){sec.appendChild(taskEl(t))});
+    var f=document.createElement("form");f.className="add";
+    var i=document.createElement("input");i.id="add-"+g[0];i.placeholder="+ добавить задачу";i.setAttribute("aria-label","Новая задача: "+g[1]);
+    var btn=document.createElement("button");btn.className="btn";btn.textContent="Добавить";
+    f.appendChild(i);f.appendChild(btn);
+    f.addEventListener("submit",function(e){e.preventDefault();var v=i.value.trim();if(!v)return;i.value="";i.blur();op({op:"add",task:{title:v,group:g[0]}})});
+    sec.appendChild(f);root.appendChild(sec);
+  });
+}
+document.addEventListener("focusout",function(){setTimeout(function(){if(pendingRender&&!busyTyping())render()},0)});
+
+function setState(s){if(s&&s.tasks){state=s;if(!state.plan)state.plan={};render()}}
+function stamp(){var d=new Date();$("#sync").textContent="Обновлено в "+String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")}
+
+function op(body){
+  return fetch("/api/op",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)})
+    .then(function(r){if(r.status===401){location.reload();return null}return r.json()})
+    .then(function(j){if(!j)return;if(j.error){showStatus("Не удалось сохранить, попробуйте ещё раз.");setState(j.state)}else{showStatus("");setState(j);stamp()}})
+    .catch(function(){showStatus("Нет связи. Изменение не сохранилось — проверьте интернет.")});
+}
+function poll(){
+  if(document.hidden)return;
+  fetch("/api/state",{cache:"no-store"}).then(function(r){if(r.status===401){location.reload();return null}return r.json()})
+    .then(function(j){if(!j)return;showStatus("");if(j.rev!==state.rev)setState(j);stamp()})
+    .catch(function(){$("#sync").textContent="Нет связи, пробую снова…"});
+}
+$("#flightDate").addEventListener("change",function(e){op({op:"plan",patch:{flightDate:e.target.value}})});
+document.addEventListener("click",function(e){
+  var b=e.target.closest(".copy");if(!b)return;var src=document.getElementById(b.dataset.copy);
+  var done=function(t){b.textContent=t;setTimeout(function(){b.textContent="Копировать"},1600)};
+  if(navigator.clipboard)navigator.clipboard.writeText(src.textContent).then(function(){done("Скопировано")},function(){done("Не вышло")});
+});
+document.addEventListener("visibilitychange",poll);
+renderTheme();renderMe();renderHero();poll();setInterval(poll,5000);
+</script></body></html>`;
