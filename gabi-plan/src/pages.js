@@ -7,6 +7,9 @@ const DASHA = '<svg class="fig dasha" viewBox="0 0 40 56" aria-hidden="true"><pa
 const GABI = '<svg class="fig gabi" viewBox="0 0 32 24" aria-hidden="true"><path d="M5 11q-4-2-2-6q2 3 4 3" fill="#d9a35f"/><g stroke="#c08640" stroke-width="3" stroke-linecap="round"><path d="M10 15l-3 6"/><path d="M13 16l1 6"/><path d="M19 16l-2 6"/><path d="M22 15l4 5"/></g><ellipse cx="15" cy="12" rx="9.5" ry="6.2" fill="#d9a35f"/><circle cx="9" cy="9" r="3" fill="#e2b170"/><circle cx="14" cy="7.5" r="3" fill="#e2b170"/><circle cx="25" cy="8" r="5.6" fill="#e2b170"/><ellipse cx="22.2" cy="9.5" rx="2.6" ry="4.2" fill="#c08640"/><circle cx="26.6" cy="7.3" r=".9" fill="#2b2b2b"/><circle cx="30" cy="9" r="1.2" fill="#2b2b2b"/></svg>';
 const ZHENYA = '<svg class="fig zhenya" viewBox="0 0 48 56" aria-hidden="true"><g stroke="#f0c4a4" stroke-width="3.6" stroke-linecap="round" fill="none"><path d="M17 20l-9-9"/><path d="M31 20l9-9"/></g><circle cx="7" cy="10" r="2.2" fill="#f0c4a4"/><circle cx="41" cy="10" r="2.2" fill="#f0c4a4"/><g stroke="#f0c4a4" stroke-width="3.6" stroke-linecap="round"><path d="M21 41v11"/><path d="M27 41v11"/></g><path d="M19 52h-2M29 52h2" stroke="#5a3d2b" stroke-width="3" stroke-linecap="round"/><rect x="16.5" y="17" width="15" height="17" rx="4" fill="#f4f4f2" stroke="#d6d3cd" stroke-width="1"/><path d="M17 33h14v7q0 2-2 2h-10q-2 0-2-2z" fill="#4aa3a8"/><circle cx="24" cy="9.5" r="6.8" fill="#f0c4a4"/><path d="M17.6 10.5q1 7 6.4 7t6.4-7q-1.5 2.5-6.4 2.5t-6.4-2.5z" fill="#c96a2b"/><circle cx="21.6" cy="8.6" r=".9" fill="#2b2b2b"/><circle cx="26.4" cy="8.6" r=".9" fill="#2b2b2b"/><path d="M22.2 13.2q1.8 1.1 3.6 0" stroke="#7a3a14" stroke-width=".9" fill="none" stroke-linecap="round"/></svg>';
 
+const WINTER = '<svg class="scn winter" viewBox="0 0 80 62" aria-hidden="true"><ellipse cx="22" cy="58" rx="30" ry="6" fill="var(--snow)" opacity=".9"/><path d="M14 52l-9 0 9-12h-5l8-11h-4l7-10 7 10h-4l8 11h-5l9 12z" fill="#2f5e4e"/><path d="M15 21l-3 4h7zM10 31l-3 4h6M21 31l3 4h-6" fill="var(--snow)"/><rect x="14" y="52" width="4" height="5" fill="#6b4a33"/><ellipse cx="52" cy="59" rx="20" ry="4" fill="var(--snow)" opacity=".8"/></svg>';
+const SUMMER = '<svg class="scn summer" viewBox="0 0 160 62" aria-hidden="true"><circle cx="62" cy="11" r="7" fill="var(--sun)"/><g stroke="var(--sun)" stroke-width="2" stroke-linecap="round" opacity=".7"><path d="M62 0v-1M73 11h2M70 3l1.5-1.5M70 19l1.5 1.5M51 11h-2M54 3l-1.5-1.5"/></g><path d="M0 58q40-8 160-4v8H0z" fill="var(--sand)"/><path d="M96 55q6-3 12 0t12 0t12 0t12 0" stroke="var(--sea)" stroke-width="2" fill="none" stroke-linecap="round" opacity=".8"/><path d="M14 56q2-22 10-38" stroke="#8a5a2b" stroke-width="3.2" fill="none" stroke-linecap="round"/><g fill="#3e9a63"><path d="M24 18q-12-6-20 2q10-2 20-2z"/><path d="M24 18q10-8 20-2q-10 0-20 2z"/><path d="M24 18q-4-10-14-10q8 4 14 10z"/><path d="M24 18q6-10 15-8q-9 2-15 8z"/><path d="M24 18q-10 2-14 12q6-8 14-12z"/></g><circle cx="23" cy="20" r="1.8" fill="#6b4a33"/><circle cx="26" cy="21" r="1.6" fill="#6b4a33"/></svg>';
+
 const HEAD = `<!doctype html><html lang="ru"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
@@ -22,7 +25,7 @@ const HEAD = `<!doctype html><html lang="ru"><head><meta charset="utf-8">
 :root{
   --bg:#fbf4ec; --surface:#ffffff; --ink:#1d2a33; --muted:#6b7780; --line:#efe2d5;
   --sea:#14949a; --sea-soft:#dcf1f1; --sunset:#ff7a59; --sunset-soft:#ffe6dc; --sun:#ffc65c;
-  --sky-a:#e3f3f4; --sky-b:#ffe9dc;
+  --sky-a:#e3f3f4; --sky-b:#ffe9dc; --winter:#dbeaf5; --summer:#ffe0c2; --snow:#ffffff; --sand:#f3d39c;
   --bad:#c8352b; --bad-soft:#fde2de; --warn:#b86a12; --warn-soft:#fff0d9; --ok:#2e8a4a; --ok-soft:#e1f4e6;
   --f-display:"Comfortaa","Nunito",system-ui,sans-serif;
   --f-body:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
@@ -31,12 +34,12 @@ const HEAD = `<!doctype html><html lang="ru"><head><meta charset="utf-8">
 @media (prefers-color-scheme: dark){:root:not([data-theme=light]){
   --bg:#0e1a24; --surface:#16242f; --ink:#eef3f5; --muted:#9aaab3; --line:#24353f;
   --sea:#4cc6c9; --sea-soft:#163a40; --sunset:#ff8f73; --sunset-soft:#3a2420; --sun:#ffd27a;
-  --sky-a:#132c3a; --sky-b:#2a2032;
+  --sky-a:#132c3a; --sky-b:#2a2032; --winter:#1a3046; --summer:#3b2a2a; --snow:#cfdde8; --sand:#8a6b3e;
   --bad:#ff8a80; --bad-soft:#3d1d1b; --warn:#f0b05a; --warn-soft:#3a2a17; --ok:#7fd494; --ok-soft:#173222; color-scheme:dark;}}
 :root[data-theme=dark]{
   --bg:#0e1a24; --surface:#16242f; --ink:#eef3f5; --muted:#9aaab3; --line:#24353f;
   --sea:#4cc6c9; --sea-soft:#163a40; --sunset:#ff8f73; --sunset-soft:#3a2420; --sun:#ffd27a;
-  --sky-a:#132c3a; --sky-b:#2a2032;
+  --sky-a:#132c3a; --sky-b:#2a2032; --winter:#1a3046; --summer:#3b2a2a; --snow:#cfdde8; --sand:#8a6b3e;
   --bad:#ff8a80; --bad-soft:#3d1d1b; --warn:#f0b05a; --warn-soft:#3a2a17; --ok:#7fd494; --ok-soft:#173222; color-scheme:dark;}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -80,16 +83,23 @@ export const NO_PASSWORD_HTML = HEAD + `</head><body><div class="wrap">
 export const APP_HTML = HEAD + `
 <style>
 /* ---------- hero postcard ---------- */
-.hero{border-radius:22px;background:linear-gradient(120deg,var(--sky-a) 0%,var(--sky-b) 100%);padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.hero{border-radius:22px;background:linear-gradient(100deg,var(--winter) 0%,var(--winter) 25%,var(--summer) 85%);padding:14px 16px;display:flex;flex-direction:column;gap:10px}
 .hrow{display:flex;align-items:center;justify-content:space-between;gap:8px 14px;flex-wrap:wrap}
 .count{display:flex;align-items:baseline;gap:8px;min-width:0}
 .count .big{font-family:var(--f-display);font-weight:700;font-size:40px;line-height:1;color:var(--sunset)}
 .count .unit{font-family:var(--f-display);font-weight:700;font-size:16px}
 .when{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:13px;font-weight:700}
 .when input{font:inherit;font-size:14px;font-weight:600;color:var(--ink);background:color-mix(in srgb,var(--surface) 75%,transparent);border:1px solid var(--line);border-radius:10px;padding:4px 8px}
-.journey{display:flex;flex-direction:column;gap:2px}
+.journey{position:relative;display:flex;flex-direction:column;gap:2px}
+.scene{position:absolute;left:-16px;right:-16px;top:0;height:62px;pointer-events:none;overflow:hidden}
+.scn{position:absolute;bottom:0;height:56px}
+.scn.winter{left:2px;width:72px}
+.scn.summer{right:0;width:160px}
+.flake{position:absolute;top:-6px;width:4px;height:4px;border-radius:50%;background:var(--snow);opacity:.9;animation:fall linear infinite}
+@keyframes fall{to{transform:translate(8px,80px)}}
+.lane{z-index:1}
 .lane{position:relative;height:62px;margin-right:50px;--p:0}
-.lane .bar{position:absolute;left:0;right:-6px;bottom:6px;height:6px;border-radius:99px;background:color-mix(in srgb,var(--ink) 10%,transparent)}
+.lane .bar{position:absolute;left:0;right:-6px;bottom:6px;height:6px;border-radius:99px;background:linear-gradient(90deg,color-mix(in srgb,var(--snow) 85%,var(--ink)),var(--sand))}
 .lane .bar>i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--sea),var(--sunset));transition:width .9s}
 .runner{position:absolute;bottom:9px;left:max(0px,calc(var(--p) * 100% - 62px));display:flex;align-items:flex-end;transition:left .9s cubic-bezier(.3,.7,.2,1)}
 .fig{display:block}
@@ -101,7 +111,7 @@ export const APP_HTML = HEAD + `
 @keyframes hop{from{transform:translateY(0)}to{transform:translateY(-3px)}}
 @keyframes wave{0%,100%{transform:rotate(0)}50%{transform:rotate(-3deg)}}
 .ends{display:flex;justify-content:space-between;font-size:12px;font-weight:800;color:var(--muted)}
-@media (prefers-reduced-motion:reduce){.fig{animation:none!important}.runner,.lane .bar>i{transition:none}}
+@media (prefers-reduced-motion:reduce){.fig,.flake{animation:none!important}.flake{display:none}.runner,.lane .bar>i{transition:none}}
 
 /* ---------- me + next ---------- */
 .row{display:flex;gap:12px;flex-wrap:wrap;align-items:stretch}
@@ -223,6 +233,7 @@ td,th{border-bottom:1px solid var(--line);padding:7px 8px;text-align:left;vertic
       <div class="when"><label for="flightDate">Вылет</label><input type="date" id="flightDate"></div>
     </div>
     <div class="journey" aria-label="Прогресс подготовки">
+      <div class="scene">${WINTER}<i class="flake" style="left:10px;animation-duration:3.2s;animation-delay:-0.4s;width:4px;height:4px"></i><i class="flake" style="left:28px;animation-duration:4.1s;animation-delay:-2.2s;width:3px;height:3px"></i><i class="flake" style="left:44px;animation-duration:3.6s;animation-delay:-1.1s;width:4px;height:4px"></i><i class="flake" style="left:62px;animation-duration:4.6s;animation-delay:-3.0s;width:3px;height:3px"></i><i class="flake" style="left:80px;animation-duration:3.9s;animation-delay:-0.9s;width:3px;height:3px"></i><i class="flake" style="left:98px;animation-duration:5.0s;animation-delay:-2.6s;width:4px;height:4px"></i><i class="flake" style="left:116px;animation-duration:4.3s;animation-delay:-1.7s;width:3px;height:3px"></i><i class="flake" style="left:132px;animation-duration:5.4s;animation-delay:-3.6s;width:3px;height:3px"></i>${SUMMER}</div>
       <div class="lane" id="lane"><div class="bar"><i id="progressBar"></i></div><div class="runner">${DASHA}${GABI}</div><div class="papa">${ZHENYA}</div></div>
       <div class="ends"><span>Иркутск</span><span>Пхукет</span></div>
     </div>
