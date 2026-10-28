@@ -1,5 +1,6 @@
 import { DurableObject } from "cloudflare:workers";
 import { SEED } from "./seed.js";
+import { MIGRATIONS } from "./migrations.js";
 import { APP_HTML, LOGIN_HTML, NO_PASSWORD_HTML } from "./pages.js";
 
 const COOKIE = "gp_auth";
@@ -117,6 +118,14 @@ export class Store extends DurableObject {
         delete t.note;
         changed = true;
       }
+    }
+    s.applied = s.applied || [];
+    for (const m of MIGRATIONS) {
+      if (s.applied.includes(m.id)) continue;
+      m.run(s);
+      s.applied.push(m.id);
+      s.rev += 1;
+      changed = true;
     }
     if (changed) await this.ctx.storage.put("state", s);
     return s;

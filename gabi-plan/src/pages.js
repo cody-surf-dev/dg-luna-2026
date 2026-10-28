@@ -240,9 +240,8 @@ td,th{border-bottom:1px solid var(--line);padding:7px 8px;text-align:left;vertic
     <details>
       <summary>Куда отправлять заявку</summary>
       <ul>
-        <li>В карантинную службу <b>первого аэропорта Таиланда</b> на маршруте. Тема письма: <b>Request an Import Permit</b>.</li>
-        <li><div class="copyrow">Прямой рейс в Пхукет: <span class="mail" id="e1">qshk_hkt@dld.go.th</span><button class="copy" data-copy="e1">Копировать</button></div>Тел. <span class="num">+66 76 351 514</span></li>
-        <li><div class="copyrow">Через Бангкок: <span class="mail" id="e2">qsap_bkk_import@dld.go.th</span><button class="copy" data-copy="e2">Копировать</button></div>Тел. <span class="num">+66 2 134 0636</span></li>
+        <li>Рейс прямой Иркутск → Пхукет, поэтому пишем в карантинную службу аэропорта Пхукета. Тема письма: <b>Request an Import Permit</b>.</li>
+        <li><div class="copyrow"><span class="mail" id="e1">qshk_hkt@dld.go.th</span><button class="copy" data-copy="e1">Копировать</button></div>Тел. <span class="num">+66 76 351 514</span></li>
         <li>Приложить: форму R1/1, скан паспорта Даши, цветное фото Габи, ветпаспорт (чип и прививки), бронь рейса, адрес в Таиланде.</li>
         <li>Ответ через 3–7 рабочих дней, разрешение действует 60 дней. Для Пхукета одна инструкция просит подавать не позднее чем за 14 дней до прилёта.</li>
       </ul>
