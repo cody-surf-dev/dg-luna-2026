@@ -169,7 +169,7 @@ footer{text-align:center;font-size:12px;color:var(--ink-soft)}
 
 <script>
 // ===== Настройки =====
-const PAGE_VER="1793298996";
+const PAGE_VER="1793299225";
 const TEST = location.hash==="#zhenya-test"; // тестовый режим
 const ARRIVAL = new Date("2026-12-25T12:00:00+07:00"); // дата приезда (время Пхукета)
 const START   = new Date("2026-10-15T06:00:00+08:00"); // день запуска странички
@@ -631,9 +631,10 @@ const QUIZ=[
  ["Наша фраза, понятная только нам?","«Да, они все долбоебы»","«Ну всё, поехали»","«Это база»","«Мы просто красивые»"]
 ];
 const MISS=["Мимо! 😏","Не-а! Женя обиделся бы, но он добрый 😄","Холодно, как в Иркутске ❄","Почти! Ну, нет, совсем не почти 😅"];
+const SPECIAL={1:"ttt",15:"chips"}; // особые игры на конкретные открытки (индекс = номер открытки - 1)
 function gameFor(i){
-  if(i===1) return {type:"ttt"};
-  if(i%2===1 && i>=3 && (i-3)/2<QUIZ.length) return {type:"quiz",q:QUIZ[(i-3)/2]};
+  if(SPECIAL[i]) return {type:SPECIAL[i]};
+  if(i%2===1 && i>=3){const q=(i-3)/2-Object.keys(SPECIAL).filter(k=>k%2==1&&k>=3&&k<i).length; if(q<QUIZ.length) return {type:"quiz",q:QUIZ[q]};}
   return {type:GAMES[Math.floor(i/2)%GAMES.length]};
 }
 function quizGame(src,win,hint,q,seed){
@@ -740,7 +741,7 @@ function simon(src,win,hint,seed){
     document.getElementById("sp").appendChild(b);return b;});
   function flash(i,ms){btns[i].classList.add("lit");setTimeout(()=>btns[i].classList.remove("lit"),ms);}
   function play(){busy=true;pos=0;document.getElementById("sm").textContent="Смотри внимательно…";
-    seq.forEach((v,k)=>setTimeout(()=>flash(v,450),700+k*700));setTimeout(()=>{busy=false;document.getElementById("sm").textContent="Теперь ты!";},700+seq.length*700);}
+    seq.forEach((v,k)=>setTimeout(()=>flash(v,450),700+k*700));setTimeout(()=>{busy=false;const e=document.getElementById("sm");if(e)e.textContent="Теперь ты!";},700+seq.length*700);}
   play();
 }
 function findGabi(src,win,hint){
@@ -761,6 +762,48 @@ function pump(src,win,hint){
     if(n>=need){art.querySelector(".gbox").remove();win();}};
 }
 const GAMES=["puzzle","catch","scratch","anagram","memory","rps","rotate","simon","find","ttt"];
+
+function chipsGame(src,win,hint){
+  const need=12;let got=0,gabi=0,alive=true;
+  hint.hidden=false;hint.innerHTML="<span>Лови чипсы в пачку! Води пальцем. Что упадёт — съест Габи 🐶</span>";
+  const art=document.getElementById("art");
+  art.innerHTML=`<img class="lockimg" src="${src}" alt=""><canvas class="scratch" id="cg" style="cursor:pointer"></canvas>`;
+  const cv=document.getElementById("cg"),r=art.getBoundingClientRect(),dpr=Math.min(2,window.devicePixelRatio||1);
+  const W=r.width,H=r.height;cv.width=W*dpr;cv.height=H*dpr;const c=cv.getContext("2d");c.scale(dpr,dpr);
+  const bw=Math.max(64,W*0.2),bh=bw*0.95;let bx=W/2,chips=[],t0=performance.now(),last=t0,spawnAt=t0+300,crumbs=[];
+  const move=e=>{const b=cv.getBoundingClientRect();bx=Math.min(W-bw/2,Math.max(bw/2,e.clientX-b.left));};
+  cv.addEventListener("pointerdown",e=>{cv.setPointerCapture(e.pointerId);move(e)});cv.addEventListener("pointermove",move);
+  function chip(x,y,rot,sz){c.save();c.translate(x,y);c.rotate(rot);c.beginPath();
+    for(let k=0;k<=24;k++){const a=k/24*Math.PI*2,rr=sz*(1+0.12*Math.sin(a*3+1));c.lineTo(Math.cos(a)*rr,Math.sin(a)*rr*0.78)}
+    c.closePath();c.fillStyle="#f3c24f";c.fill();c.strokeStyle="#d79a2b";c.lineWidth=2;c.stroke();
+    c.fillStyle="#e2a93a";[[-.3,-.2],[.25,.15],[.05,-.35]].forEach(([u,v])=>{c.beginPath();c.arc(u*sz,v*sz,sz*.09,0,7);c.fill()});c.restore();}
+  function pack(x){const y=H-bh-6;c.save();c.translate(x-bw/2,y);
+    c.fillStyle="#3d8bd9";c.beginPath();c.moveTo(0,8);c.lineTo(bw,8);c.lineTo(bw-6,bh);c.lineTo(6,bh);c.closePath();c.fill();
+    c.fillStyle="#2f74bd";c.fillRect(0,0,bw,10);
+    c.fillStyle="#ffd23f";c.beginPath();c.ellipse(bw/2,bh*.48,bw*.3,bh*.2,0,0,7);c.fill();
+    c.fillStyle="#d7332d";c.font="bold "+Math.round(bw*.17)+"px Manrope, sans-serif";c.textAlign="center";c.textBaseline="middle";c.fillText("ЧИПСЫ",bw/2,bh*.49);
+    c.restore();}
+  function frame(now){
+    if(!alive||!document.body.contains(cv))return;
+    const dt=Math.min(50,now-last)/1000;last=now;
+    if(now>spawnAt){chips.push({x:20+Math.random()*(W-40),y:-20,v:H*(0.32+Math.random()*0.18+got*0.012),rot:Math.random()*6,vr:(Math.random()-.5)*4,sz:Math.max(12,W*0.035)});spawnAt=now+650+Math.random()*450;}
+    c.clearRect(0,0,W,H);
+    c.fillStyle="rgba(255,250,242,.35)";c.fillRect(0,0,W,H);
+    const top=H-bh-6;
+    chips=chips.filter(ch=>{ch.y+=ch.v*dt;ch.rot+=ch.vr*dt;
+      if(ch.y>top&&ch.y<top+bh*.4&&Math.abs(ch.x-bx)<bw/2){got++;for(let k=0;k<6;k++)crumbs.push({x:ch.x,y:top,vx:(Math.random()-.5)*120,vy:-Math.random()*140,l:.5});
+        if(got>=need){alive=false;win();}return false;}
+      if(ch.y>H+20){gabi++;return false;}
+      chip(ch.x,ch.y,ch.rot,ch.sz);return true;});
+    crumbs=crumbs.filter(p=>{p.l-=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=400*dt;c.fillStyle="#e2a93a";c.fillRect(p.x,p.y,3,3);return p.l>0;});
+    pack(bx);
+    c.fillStyle="#2b2340";c.font="700 "+Math.round(Math.max(14,W*.04))+"px Unbounded, sans-serif";c.textAlign="left";c.textBaseline="top";
+    c.fillText("В пачке: "+got+" / "+need,12,10);
+    c.textAlign="right";c.font="600 "+Math.round(Math.max(12,W*.032))+"px Manrope, sans-serif";c.fillText("Габи съела: "+gabi+" 🐶",W-12,12);
+    if(alive)requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
 function showCard(idx){
   const now=new Date();
   let arrived=ARRIVAL<=now, days=Math.max(0,tzDay(ARRIVAL)-tzDay(now));
@@ -796,7 +839,7 @@ function showCard(idx){
     const win=()=>{markSolved(idx);celebrate();setTimeout(()=>{if(viewIdx===idx)showOpen()},900);};
     const g=gameFor(idx);
     if(g.type==="quiz") quizGame(src,win,hint,g.q,idx);
-    else ({puzzle,scratch,memory,catch:catchHearts,anagram,ttt:ticTacToe,rotate:rotateGame,rps,simon,find:findGabi,pump})[g.type](src,win,hint,idx);
+    else ({puzzle,scratch,memory,catch:catchHearts,anagram,ttt:ticTacToe,chips:chipsGame,rotate:rotateGame,rps,simon,find:findGabi,pump})[g.type](src,win,hint,idx);
   } else showOpen();
   document.getElementById("no").textContent=idx+1;
   const d=new Date(START.getTime()+idx*DAY);
