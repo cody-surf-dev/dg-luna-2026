@@ -76,4 +76,15 @@ export const MIGRATIONS = [
       });
     },
   },
+  {
+    id: "2026-10-30-vet-food",
+    run(s) {
+      if (s.tasks.some(t => t.id === "t25")) return;
+      s.tasks.push({
+        id: "t25", group: "vet", order: 40, done: false, who: "", due: "",
+        title: "Выбрать ветеринарный корм, который продаётся на Пхукете",
+        notes: [note("Женя проверил 30.10. Точно есть в Таиланде: Royal Canin (Gastrointestinal, GI Low Fat, Hypoallergenic, Sensitivity Control), Hill's (i/d, i/d Low Fat, Gastrointestinal Biome, z/d, d/d, Derm Complete), Purina Pro Plan Vet (EN Gastrointestinal и EN Low Fat; HA в Таиланде не найден). Farmina Vet Life и Monge VetSolution продаж в Таиланде не нашёл. Решить вместе с ветеринаром, на каком корме Габи будет до и после перелёта.")],
+      });
+    },
+  },
 ];
